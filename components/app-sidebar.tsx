@@ -55,12 +55,7 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
           { title: "Profil", url: "/teacher/profile", icon: Settings },
         ];
       case "student":
-        return [
-          { title: "Dashboard", url: "/student/dashboard", icon: Home },
-          { title: "Mes TD", url: "/student/td", icon: BookOpen },
-          { title: "Planning", url: "/student/schedule", icon: Calendar },
-          { title: "Épreuves", url: "/student/exams", icon: FileText },
-        ];
+        return [{ title: "Dashboard", url: "/student/dashboard", icon: Home }];
       default:
         return [];
     }

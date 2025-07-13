@@ -16,6 +16,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import React, { useState } from "react";
 
 export default function StudentDashboard() {
   const stats = [
@@ -40,7 +41,7 @@ export default function StudentDashboard() {
     { title: "Prochains TD", value: "2", icon: Clock, color: "bg-orange-500" },
   ];
 
-  const upcomingTD = [
+  const tdList = [
     {
       id: 1,
       subject: "Mathématiques",
@@ -50,6 +51,7 @@ export default function StudentDashboard() {
       duration: "2h",
       status: "confirme",
       hasExam: true,
+      examDownloaded: false,
     },
     {
       id: 2,
@@ -60,10 +62,8 @@ export default function StudentDashboard() {
       duration: "3h",
       status: "en_attente",
       hasExam: false,
+      examDownloaded: false,
     },
-  ];
-
-  const completedTD = [
     {
       id: 3,
       subject: "Sciences",
@@ -88,10 +88,12 @@ export default function StudentDashboard() {
     },
   ];
 
-  const allTD = [
-    ...upcomingTD.map((td) => ({ ...td, examDownloaded: false })),
-    ...completedTD,
-  ];
+  const [selectedDate, setSelectedDate] = useState<string>("");
+
+  // Filtrer les TD selon la date sélectionnée
+  const filteredTD = selectedDate
+    ? tdList.filter((td) => td.date === selectedDate)
+    : tdList;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -132,7 +134,7 @@ export default function StudentDashboard() {
 
         <div className="flex-1 space-y-6 p-6">
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -148,87 +150,73 @@ export default function StudentDashboard() {
                 </CardContent>
               </Card>
             ))}
+          </div> */}
+
+          {/* Champ de filtre par date */}
+          <div className="mb-4 flex items-center gap-2">
+            <label htmlFor="date-filter" className="text-sm font-medium">
+              Filtrer par date :
+            </label>
+            <input
+              id="date-filter"
+              type="date"
+              className="border rounded px-2 py-1 text-sm"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
+            {selectedDate && (
+              <Button
+                type="button"
+                size="sm"
+                className="ml-2 bg-blue-500 text-white hover:bg-blue-600"
+                onClick={() => setSelectedDate("")}
+              >
+                Réinitialiser
+              </Button>
+            )}
           </div>
 
           {/* Grille de TD */}
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {allTD.map((td) => (
-              <Card key={td.id}>
-                <CardHeader>
-                  <CardTitle className="text-base font-medium">
-                    {td.subject}
-                  </CardTitle>
-                  <CardDescription>{td.teacher}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm mb-2">
-                    <p>
-                      <strong>Date:</strong> {td.date} à {td.time}
-                    </p>
-                    <p>
-                      <strong>Durée:</strong> {td.duration}
-                    </p>
-                  </div>
-                  {td.hasExam && (
-                    <Button
-                      size="sm"
-                      variant={td.examDownloaded ? "secondary" : "default"}
-                      onClick={() => handleDownloadExam(td.id)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      {td.examDownloaded
-                        ? "Téléchargé"
-                        : "Télécharger l'épreuve"}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Planning de la semaine */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Planning de la semaine</CardTitle>
-              <CardDescription>
-                Vos TD programmés pour cette semaine
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-7">
-                {[
-                  "Lundi",
-                  "Mardi",
-                  "Mercredi",
-                  "Jeudi",
-                  "Vendredi",
-                  "Samedi",
-                  "Dimanche",
-                ].map((day, index) => (
-                  <div key={day} className="p-3 border rounded-lg">
-                    <h4 className="font-medium text-sm mb-2">{day}</h4>
-                    {index === 0 || index === 2 ? (
-                      <div className="space-y-2">
-                        <div className="text-xs p-2 bg-blue-50 rounded">
-                          <p className="font-medium">Mathématiques</p>
-                          <p>14:00-16:00</p>
-                        </div>
-                      </div>
-                    ) : index === 4 ? (
-                      <div className="space-y-2">
-                        <div className="text-xs p-2 bg-green-50 rounded">
-                          <p className="font-medium">Français</p>
-                          <p>10:00-13:00</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">Aucun TD</p>
-                    )}
-                  </div>
-                ))}
+            {filteredTD.length === 0 ? (
+              <div className="col-span-full text-center text-muted-foreground">
+                Aucun TD disponible à cette date.
               </div>
-            </CardContent>
-          </Card>
+            ) : (
+              filteredTD.map((td) => (
+                <Card key={td.id}>
+                  <CardHeader>
+                    <CardTitle className="text-base font-medium">
+                      {td.subject}
+                    </CardTitle>
+                    <CardDescription>{td.teacher}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm mb-2">
+                      <p>
+                        <strong>Date:</strong> {td.date} à {td.time}
+                      </p>
+                      <p>
+                        <strong>Durée:</strong> {td.duration}
+                      </p>
+                    </div>
+                    {td.hasExam && (
+                      <Button
+                        size="sm"
+                        variant={td.examDownloaded ? "secondary" : "default"}
+                        onClick={() => handleDownloadExam(td.id)}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        {td.examDownloaded
+                          ? "Téléchargé"
+                          : "Télécharger l'épreuve"}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
 
           {/* Conseils et informations */}
           <div className="grid gap-4 md:grid-cols-2">
@@ -251,32 +239,6 @@ export default function StudentDashboard() {
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                     <p>Apportez tout le matériel nécessaire</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistiques personnelles</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm">TD suivis ce mois</span>
-                    <span className="font-medium">12</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Taux de présence</span>
-                    <span className="font-medium">95%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Matière favorite</span>
-                    <span className="font-medium">Mathématiques</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Épreuves téléchargées</span>
-                    <span className="font-medium">8/12</span>
                   </div>
                 </div>
               </CardContent>
