@@ -1,12 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -14,14 +26,35 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { Plus, Search, Edit, Trash2, Mail, Phone, Building, UserRound, Users } from "lucide-react"
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Mail,
+  Phone,
+  Building,
+  UserRound,
+  Users,
+} from "lucide-react";
 
 export default function AdminStudentsPage() {
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newStudent, setNewStudent] = useState({
     name: "",
     parentName: "",
@@ -29,7 +62,9 @@ export default function AdminStudentsPage() {
     phone: "",
     school: "",
     class: "",
-  })
+  });
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editStudent, setEditStudent] = useState<any>(null);
 
   const students = [
     {
@@ -72,7 +107,7 @@ export default function AdminStudentsPage() {
       class: "3ème",
       status: "inactive",
     },
-  ]
+  ];
 
   const schools = [
     "Collège Moderne de Cocody",
@@ -80,35 +115,35 @@ export default function AdminStudentsPage() {
     "École Primaire Les Palmiers",
     "Collège Sainte-Marie",
     "Groupe Scolaire Excellence",
-  ]
+  ];
 
   const getClassBadge = (className: string) => {
     switch (className) {
       case "CM2":
-        return <Badge variant="secondary">CM2</Badge>
+        return <Badge variant="secondary">CM2</Badge>;
       case "3ème":
-        return <Badge variant="default">3ème</Badge>
+        return <Badge variant="default">3ème</Badge>;
       case "Tle":
-        return <Badge className="bg-blue-600">Tle</Badge>
+        return <Badge className="bg-blue-600">Tle</Badge>;
       default:
-        return <Badge variant="outline">{className}</Badge>
+        return <Badge variant="outline">{className}</Badge>;
     }
-  }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-green-600">Actif</Badge>
+        return <Badge className="bg-green-600">Actif</Badge>;
       case "inactive":
-        return <Badge variant="secondary">Inactif</Badge>
+        return <Badge variant="secondary">Inactif</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{status}</Badge>;
     }
-  }
+  };
 
   const handleCreateStudent = () => {
-    console.log("Création apprenant:", newStudent)
-    setShowCreateDialog(false)
+    console.log("Création apprenant:", newStudent);
+    setShowCreateDialog(false);
     setNewStudent({
       name: "",
       parentName: "",
@@ -116,12 +151,18 @@ export default function AdminStudentsPage() {
       phone: "",
       school: "",
       class: "",
-    })
-  }
+    });
+  };
+
+  const handleEditStudent = () => {
+    console.log("Modification apprenant:", editStudent);
+    setShowEditDialog(false);
+    setEditStudent(null);
+  };
 
   const sendCredentials = (userId: number) => {
-    console.log(`Envoi des identifiants pour l'apprenant ${userId}`)
-  }
+    console.log(`Envoi des identifiants pour l'apprenant ${userId}`);
+  };
 
   return (
     <SidebarProvider>
@@ -131,7 +172,9 @@ export default function AdminStudentsPage() {
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1">
             <h1 className="text-xl font-semibold">Gestion des Apprenants</h1>
-            <p className="text-sm text-muted-foreground">Ajouter et gérer les apprenants de la plateforme</p>
+            <p className="text-sm text-muted-foreground">
+              Ajouter et gérer les apprenants de la plateforme
+            </p>
           </div>
         </header>
 
@@ -140,7 +183,10 @@ export default function AdminStudentsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Rechercher un apprenant..." className="pl-10 w-64" />
+              <Input
+                placeholder="Rechercher un apprenant..."
+                className="pl-10 w-64"
+              />
             </div>
 
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -153,7 +199,9 @@ export default function AdminStudentsPage() {
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Ajouter un nouvel apprenant</DialogTitle>
-                  <DialogDescription>Créez un compte pour un apprenant</DialogDescription>
+                  <DialogDescription>
+                    Créez un compte pour un apprenant
+                  </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
@@ -163,16 +211,25 @@ export default function AdminStudentsPage() {
                       <Input
                         id="name"
                         value={newStudent.name}
-                        onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                        onChange={(e) =>
+                          setNewStudent({ ...newStudent, name: e.target.value })
+                        }
                         placeholder="Ex: Kouadio Marie"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="parentName">Nom et prénom du parent</Label>
+                      <Label htmlFor="parentName">
+                        Nom et prénom du parent
+                      </Label>
                       <Input
                         id="parentName"
                         value={newStudent.parentName}
-                        onChange={(e) => setNewStudent({ ...newStudent, parentName: e.target.value })}
+                        onChange={(e) =>
+                          setNewStudent({
+                            ...newStudent,
+                            parentName: e.target.value,
+                          })
+                        }
                         placeholder="Ex: Kouadio Robert"
                       />
                     </div>
@@ -185,16 +242,28 @@ export default function AdminStudentsPage() {
                         id="email"
                         type="email"
                         value={newStudent.email}
-                        onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                        onChange={(e) =>
+                          setNewStudent({
+                            ...newStudent,
+                            email: e.target.value,
+                          })
+                        }
                         placeholder="email@exemple.com"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Numéro de téléphone du parent</Label>
+                      <Label htmlFor="phone">
+                        Numéro de téléphone du parent
+                      </Label>
                       <Input
                         id="phone"
                         value={newStudent.phone}
-                        onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })}
+                        onChange={(e) =>
+                          setNewStudent({
+                            ...newStudent,
+                            phone: e.target.value,
+                          })
+                        }
                         placeholder="+225 XX XX XX XX"
                       />
                     </div>
@@ -204,7 +273,9 @@ export default function AdminStudentsPage() {
                     <Label htmlFor="school">Établissement</Label>
                     <Select
                       value={newStudent.school}
-                      onValueChange={(value) => setNewStudent({ ...newStudent, school: value })}
+                      onValueChange={(value) =>
+                        setNewStudent({ ...newStudent, school: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un établissement" />
@@ -223,7 +294,9 @@ export default function AdminStudentsPage() {
                     <Label htmlFor="class">Classe</Label>
                     <Select
                       value={newStudent.class}
-                      onValueChange={(value) => setNewStudent({ ...newStudent, class: value })}
+                      onValueChange={(value) =>
+                        setNewStudent({ ...newStudent, class: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une classe" />
@@ -238,10 +311,15 @@ export default function AdminStudentsPage() {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCreateDialog(false)}
+                  >
                     Annuler
                   </Button>
-                  <Button onClick={handleCreateStudent}>Créer l'apprenant</Button>
+                  <Button onClick={handleCreateStudent}>
+                    Créer l'apprenant
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -251,7 +329,9 @@ export default function AdminStudentsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Liste des apprenants</CardTitle>
-              <CardDescription>Gérez tous les apprenants de la plateforme</CardDescription>
+              <CardDescription>
+                Gérez tous les apprenants de la plateforme
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -262,7 +342,6 @@ export default function AdminStudentsPage() {
                     <TableHead>Contact</TableHead>
                     <TableHead>Établissement</TableHead>
                     <TableHead>Classe</TableHead>
-                    <TableHead>Statut</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -300,16 +379,23 @@ export default function AdminStudentsPage() {
                         </div>
                       </TableCell>
                       <TableCell>{getClassBadge(student.class)}</TableCell>
-                      <TableCell>{getStatusBadge(student.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => sendCredentials(student.id)}>
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditStudent(student);
+                              setShowEditDialog(true);
+                            }}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -321,71 +407,137 @@ export default function AdminStudentsPage() {
             </CardContent>
           </Card>
 
-          {/* Statistics */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Statistiques</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Total apprenants</span>
-                    <span className="font-medium">{students.length}</span>
+          {/* Dialog pour édition apprenant */}
+          <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Modifier l'apprenant</DialogTitle>
+                <DialogDescription>
+                  Modifiez les informations de l'apprenant
+                </DialogDescription>
+              </DialogHeader>
+              {editStudent && (
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nom et prénom de l'apprenant</Label>
+                      <Input
+                        id="name"
+                        value={editStudent.name}
+                        onChange={(e) =>
+                          setEditStudent({
+                            ...editStudent,
+                            name: e.target.value,
+                          })
+                        }
+                        placeholder="Ex: Kouadio Marie"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="parentName">
+                        Nom et prénom du parent
+                      </Label>
+                      <Input
+                        id="parentName"
+                        value={editStudent.parentName}
+                        onChange={(e) =>
+                          setEditStudent({
+                            ...editStudent,
+                            parentName: e.target.value,
+                          })
+                        }
+                        placeholder="Ex: Kouadio Robert"
+                      />
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Apprenants actifs</span>
-                    <span className="font-medium">{students.filter((s) => s.status === "active").length}</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email du parent</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={editStudent.email}
+                        onChange={(e) =>
+                          setEditStudent({
+                            ...editStudent,
+                            email: e.target.value,
+                          })
+                        }
+                        placeholder="email@exemple.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">
+                        Numéro de téléphone du parent
+                      </Label>
+                      <Input
+                        id="phone"
+                        value={editStudent.phone}
+                        onChange={(e) =>
+                          setEditStudent({
+                            ...editStudent,
+                            phone: e.target.value,
+                          })
+                        }
+                        placeholder="+225 XX XX XX XX"
+                      />
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Apprenants inactifs</span>
-                    <span className="font-medium">{students.filter((s) => s.status === "inactive").length}</span>
+                  <div className="space-y-2">
+                    <Label htmlFor="school">Établissement</Label>
+                    <Select
+                      value={editStudent.school}
+                      onValueChange={(value) =>
+                        setEditStudent({ ...editStudent, school: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un établissement" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {schools.map((school) => (
+                          <SelectItem key={school} value={school}>
+                            {school}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="class">Classe</Label>
+                    <Select
+                      value={editStudent.class}
+                      onValueChange={(value) =>
+                        setEditStudent({ ...editStudent, class: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une classe" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CM2">CM2</SelectItem>
+                        <SelectItem value="3ème">3ème</SelectItem>
+                        <SelectItem value="Tle">Terminale</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Répartition par classe</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm">CM2</span>
-                    <span className="font-medium">{students.filter((s) => s.class === "CM2").length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">3ème</span>
-                    <span className="font-medium">{students.filter((s) => s.class === "3ème").length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Terminale</span>
-                    <span className="font-medium">{students.filter((s) => s.class === "Tle").length}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Actions rapides</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" size="sm">
-                  Envoyer identifiants en masse
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEditDialog(false)}
+                >
+                  Annuler
                 </Button>
-                <Button className="w-full justify-start" variant="outline" size="sm">
-                  Exporter la liste
+                <Button onClick={handleEditStudent}>
+                  Modifier l'apprenant
                 </Button>
-                <Button className="w-full justify-start" variant="outline" size="sm">
-                  Import depuis Excel
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

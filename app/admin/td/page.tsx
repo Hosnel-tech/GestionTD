@@ -157,6 +157,18 @@ export default function AdminTDPage() {
     });
   };
 
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [selectedTD, setSelectedTD] = useState<any>(null);
+
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editTD, setEditTD] = useState<any>(null);
+
+  const handleEditTD = () => {
+    console.log("Modification TD:", editTD);
+    setShowEditDialog(false);
+    setEditTD(null);
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar userRole="admin" />
@@ -364,10 +376,24 @@ export default function AdminTDPage() {
                     <div className="flex items-center gap-3">
                       {getStatusBadge(td.status)}
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedTD(td);
+                            setShowDetailDialog(true);
+                          }}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditTD({ ...td, examFile: null });
+                            setShowEditDialog(true);
+                          }}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
@@ -384,6 +410,204 @@ export default function AdminTDPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Dialog pour détails TD */}
+          <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Détails du TD</DialogTitle>
+                <DialogDescription>
+                  Informations sur le travail dirigé sélectionné
+                </DialogDescription>
+              </DialogHeader>
+              {selectedTD && (
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Matière</Label>
+                      <Input value={selectedTD.subject} readOnly />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Classe</Label>
+                      <Input value={selectedTD.class} readOnly />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Enseignant</Label>
+                    <Input value={selectedTD.teacher} readOnly />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Date</Label>
+                      <Input value={selectedTD.date} readOnly />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Heure</Label>
+                      <Input value={selectedTD.time} readOnly />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Durée</Label>
+                      <Input value={selectedTD.duration} readOnly />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Statut</Label>
+                    <Input value={selectedTD.status} readOnly />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Nombre d'élèves</Label>
+                    <Input value={selectedTD.students} readOnly />
+                  </div>
+                </div>
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDetailDialog(false)}
+                >
+                  Fermer
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Dialog pour édition TD */}
+          <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Modifier le TD</DialogTitle>
+                <DialogDescription>
+                  Modifiez les informations du travail dirigé
+                </DialogDescription>
+              </DialogHeader>
+              {editTD && (
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Matière</Label>
+                      <Input
+                        id="subject"
+                        value={editTD.subject}
+                        onChange={(e) =>
+                          setEditTD({ ...editTD, subject: e.target.value })
+                        }
+                        placeholder="Ex: Mathématiques"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="class">Classe</Label>
+                      <Select
+                        value={editTD.class}
+                        onValueChange={(value) =>
+                          setEditTD({ ...editTD, class: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une classe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="CM2">CM2</SelectItem>
+                          <SelectItem value="3ème">3ème</SelectItem>
+                          <SelectItem value="Tle">Terminale</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="teacher">Enseignant</Label>
+                    <Select
+                      value={editTD.teacher}
+                      onValueChange={(value) =>
+                        setEditTD({ ...editTD, teacher: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un enseignant" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teachers.map((teacher) => (
+                          <SelectItem key={teacher.id} value={teacher.name}>
+                            {teacher.name} - {teacher.level}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="date">Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={editTD.date}
+                        onChange={(e) =>
+                          setEditTD({ ...editTD, date: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="time">Heure</Label>
+                      <Input
+                        id="time"
+                        type="time"
+                        value={editTD.time}
+                        onChange={(e) =>
+                          setEditTD({ ...editTD, time: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="duration">Durée</Label>
+                      <Input
+                        id="duration"
+                        value={editTD.duration}
+                        onChange={(e) =>
+                          setEditTD({ ...editTD, duration: e.target.value })
+                        }
+                        placeholder="Ex: 2h"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={editTD.description || ""}
+                      onChange={(e) =>
+                        setEditTD({ ...editTD, description: e.target.value })
+                      }
+                      placeholder="Description du TD..."
+                      rows={3}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="examFile">Épreuve (fichier PDF)</Label>
+                    <Input
+                      id="examFile"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) =>
+                        setEditTD({
+                          ...editTD,
+                          examFile:
+                            (e.target as HTMLInputElement).files?.[0] || null,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEditDialog(false)}
+                >
+                  Annuler
+                </Button>
+                <Button onClick={handleEditTD}>Modifier le TD</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </SidebarInset>
     </SidebarProvider>

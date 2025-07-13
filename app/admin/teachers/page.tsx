@@ -1,12 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -14,14 +26,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { Plus, Search, Edit, Trash2, Mail, Phone, Building } from "lucide-react"
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Mail,
+  Phone,
+  Building,
+} from "lucide-react";
 
 export default function AdminTeachersPage() {
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newTeacher, setNewTeacher] = useState({
     name: "",
     email: "",
@@ -29,7 +60,9 @@ export default function AdminTeachersPage() {
     school: "",
     class: "",
     subjects: "",
-  })
+  });
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editTeacher, setEditTeacher] = useState<any>(null);
 
   const teachers = [
     {
@@ -80,7 +113,7 @@ export default function AdminTeachersPage() {
       paymentMethod: "electronique",
       status: "inactive",
     },
-  ]
+  ];
 
   const schools = [
     "Collège Moderne de Cocody",
@@ -88,33 +121,33 @@ export default function AdminTeachersPage() {
     "École Primaire Les Palmiers",
     "Collège Sainte-Marie",
     "Groupe Scolaire Excellence",
-  ]
+  ];
 
   const getLevelBadge = (level: string) => {
     switch (level) {
       case "primaire":
-        return <Badge variant="secondary">Primaire</Badge>
+        return <Badge variant="secondary">Primaire</Badge>;
       case "secondaire":
-        return <Badge variant="default">Secondaire</Badge>
+        return <Badge variant="default">Secondaire</Badge>;
       default:
-        return <Badge variant="outline">{level}</Badge>
+        return <Badge variant="outline">{level}</Badge>;
     }
-  }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-green-600">Actif</Badge>
+        return <Badge className="bg-green-600">Actif</Badge>;
       case "inactive":
-        return <Badge variant="secondary">Inactif</Badge>
+        return <Badge variant="secondary">Inactif</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{status}</Badge>;
     }
-  }
+  };
 
   const handleCreateTeacher = () => {
-    console.log("Création enseignant:", newTeacher)
-    setShowCreateDialog(false)
+    console.log("Création enseignant:", newTeacher);
+    setShowCreateDialog(false);
     setNewTeacher({
       name: "",
       email: "",
@@ -122,12 +155,18 @@ export default function AdminTeachersPage() {
       school: "",
       class: "",
       subjects: "",
-    })
-  }
+    });
+  };
+
+  const handleEditTeacher = () => {
+    console.log("Modification enseignant:", editTeacher);
+    setShowEditDialog(false);
+    setEditTeacher(null);
+  };
 
   const sendCredentials = (userId: number) => {
-    console.log(`Envoi des identifiants pour l'enseignant ${userId}`)
-  }
+    console.log(`Envoi des identifiants pour l'enseignant ${userId}`);
+  };
 
   return (
     <SidebarProvider>
@@ -137,7 +176,9 @@ export default function AdminTeachersPage() {
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1">
             <h1 className="text-xl font-semibold">Gestion des Enseignants</h1>
-            <p className="text-sm text-muted-foreground">Ajouter et gérer les enseignants de la plateforme</p>
+            <p className="text-sm text-muted-foreground">
+              Ajouter et gérer les enseignants de la plateforme
+            </p>
           </div>
         </header>
 
@@ -146,7 +187,10 @@ export default function AdminTeachersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Rechercher un enseignant..." className="pl-10 w-64" />
+              <Input
+                placeholder="Rechercher un enseignant..."
+                className="pl-10 w-64"
+              />
             </div>
 
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -159,7 +203,9 @@ export default function AdminTeachersPage() {
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Ajouter un nouvel enseignant</DialogTitle>
-                  <DialogDescription>Créez un compte pour un enseignant</DialogDescription>
+                  <DialogDescription>
+                    Créez un compte pour un enseignant
+                  </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
@@ -168,7 +214,9 @@ export default function AdminTeachersPage() {
                     <Input
                       id="name"
                       value={newTeacher.name}
-                      onChange={(e) => setNewTeacher({ ...newTeacher, name: e.target.value })}
+                      onChange={(e) =>
+                        setNewTeacher({ ...newTeacher, name: e.target.value })
+                      }
                       placeholder="Ex: M. Kouassi Jean"
                     />
                   </div>
@@ -180,7 +228,12 @@ export default function AdminTeachersPage() {
                         id="email"
                         type="email"
                         value={newTeacher.email}
-                        onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })}
+                        onChange={(e) =>
+                          setNewTeacher({
+                            ...newTeacher,
+                            email: e.target.value,
+                          })
+                        }
                         placeholder="email@exemple.com"
                       />
                     </div>
@@ -189,7 +242,12 @@ export default function AdminTeachersPage() {
                       <Input
                         id="phone"
                         value={newTeacher.phone}
-                        onChange={(e) => setNewTeacher({ ...newTeacher, phone: e.target.value })}
+                        onChange={(e) =>
+                          setNewTeacher({
+                            ...newTeacher,
+                            phone: e.target.value,
+                          })
+                        }
                         placeholder="+225 XX XX XX XX"
                       />
                     </div>
@@ -199,7 +257,9 @@ export default function AdminTeachersPage() {
                     <Label htmlFor="school">Établissement</Label>
                     <Select
                       value={newTeacher.school}
-                      onValueChange={(value) => setNewTeacher({ ...newTeacher, school: value })}
+                      onValueChange={(value) =>
+                        setNewTeacher({ ...newTeacher, school: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un établissement" />
@@ -218,7 +278,9 @@ export default function AdminTeachersPage() {
                     <Label htmlFor="class">Classe</Label>
                     <Select
                       value={newTeacher.class}
-                      onValueChange={(value) => setNewTeacher({ ...newTeacher, class: value })}
+                      onValueChange={(value) =>
+                        setNewTeacher({ ...newTeacher, class: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une classe" />
@@ -235,13 +297,17 @@ export default function AdminTeachersPage() {
                     <Label htmlFor="subjects">Matière enseignée</Label>
                     <Select
                       value={newTeacher.subjects}
-                      onValueChange={(value) => setNewTeacher({ ...newTeacher, subjects: value })}
+                      onValueChange={(value) =>
+                        setNewTeacher({ ...newTeacher, subjects: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une matière" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Mathématiques">Mathématiques</SelectItem>
+                        <SelectItem value="Mathématiques">
+                          Mathématiques
+                        </SelectItem>
                         <SelectItem value="Français">Français</SelectItem>
                         <SelectItem value="Physique">Physique</SelectItem>
                         <SelectItem value="Chimie">Chimie</SelectItem>
@@ -251,17 +317,24 @@ export default function AdminTeachersPage() {
                         <SelectItem value="Anglais">Anglais</SelectItem>
                         <SelectItem value="Littérature">Littérature</SelectItem>
                         <SelectItem value="Philosophie">Philosophie</SelectItem>
-                        <SelectItem value="Éducation Physique">Éducation Physique</SelectItem>
+                        <SelectItem value="Éducation Physique">
+                          Éducation Physique
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCreateDialog(false)}
+                  >
                     Annuler
                   </Button>
-                  <Button onClick={handleCreateTeacher}>Créer l'enseignant</Button>
+                  <Button onClick={handleCreateTeacher}>
+                    Créer l'enseignant
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -271,7 +344,9 @@ export default function AdminTeachersPage() {
           <Card>
             <CardHeader>
               <CardTitle>Liste des enseignants</CardTitle>
-              <CardDescription>Gérez tous les enseignants de la plateforme</CardDescription>
+              <CardDescription>
+                Gérez tous les enseignants de la plateforme
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -283,14 +358,15 @@ export default function AdminTeachersPage() {
                     <TableHead>Niveau</TableHead>
                     <TableHead>Classe(s)</TableHead>
                     <TableHead>Matières</TableHead>
-                    <TableHead>Statut</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {teachers.map((teacher) => (
                     <TableRow key={teacher.id}>
-                      <TableCell className="font-medium">{teacher.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {teacher.name}
+                      </TableCell>
                       <TableCell>
                         <div className="text-sm">
                           <div className="flex items-center gap-1">
@@ -312,16 +388,23 @@ export default function AdminTeachersPage() {
                       <TableCell>{getLevelBadge(teacher.level)}</TableCell>
                       <TableCell>{teacher.class}</TableCell>
                       <TableCell>{teacher.subjects}</TableCell>
-                      <TableCell>{getStatusBadge(teacher.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => sendCredentials(teacher.id)}>
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditTeacher(teacher);
+                              setShowEditDialog(true);
+                            }}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -332,72 +415,131 @@ export default function AdminTeachersPage() {
               </Table>
             </CardContent>
           </Card>
-
-          {/* Statistics */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Statistiques</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Total enseignants</span>
-                    <span className="font-medium">{teachers.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Enseignants actifs</span>
-                    <span className="font-medium">{teachers.filter((t) => t.status === "active").length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Enseignants inactifs</span>
-                    <span className="font-medium">{teachers.filter((t) => t.status === "inactive").length}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Répartition par niveau</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Primaire</span>
-                    <span className="font-medium">{teachers.filter((t) => t.level === "primaire").length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Secondaire</span>
-                    <span className="font-medium">{teachers.filter((t) => t.level === "secondaire").length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Établissements</span>
-                    <span className="font-medium">{new Set(teachers.map((t) => t.school)).size}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Actions rapides</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" size="sm">
-                  Envoyer identifiants en masse
-                </Button>
-                <Button className="w-full justify-start" variant="outline" size="sm">
-                  Exporter la liste
-                </Button>
-                <Button className="w-full justify-start" variant="outline" size="sm">
-                  Import depuis Excel
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </SidebarInset>
+      {/* Dialog pour édition enseignant */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Modifier l'enseignant</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de l'enseignant
+            </DialogDescription>
+          </DialogHeader>
+          {editTeacher && (
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom et prénom</Label>
+                <Input
+                  id="name"
+                  value={editTeacher.name}
+                  onChange={(e) =>
+                    setEditTeacher({ ...editTeacher, name: e.target.value })
+                  }
+                  placeholder="Ex: M. Kouassi Jean"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={editTeacher.email}
+                    onChange={(e) =>
+                      setEditTeacher({ ...editTeacher, email: e.target.value })
+                    }
+                    placeholder="email@exemple.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Numéro de téléphone</Label>
+                  <Input
+                    id="phone"
+                    value={editTeacher.phone}
+                    onChange={(e) =>
+                      setEditTeacher({ ...editTeacher, phone: e.target.value })
+                    }
+                    placeholder="+225 XX XX XX XX"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school">Établissement</Label>
+                <Select
+                  value={editTeacher.school}
+                  onValueChange={(value) =>
+                    setEditTeacher({ ...editTeacher, school: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un établissement" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {schools.map((school) => (
+                      <SelectItem key={school} value={school}>
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="class">Classe</Label>
+                <Select
+                  value={editTeacher.class}
+                  onValueChange={(value) =>
+                    setEditTeacher({ ...editTeacher, class: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une classe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CM2">CM2</SelectItem>
+                    <SelectItem value="3ème">3ème</SelectItem>
+                    <SelectItem value="Tle">Terminale</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subjects">Matière enseignée</Label>
+                <Select
+                  value={editTeacher.subjects}
+                  onValueChange={(value) =>
+                    setEditTeacher({ ...editTeacher, subjects: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une matière" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Mathématiques">Mathématiques</SelectItem>
+                    <SelectItem value="Français">Français</SelectItem>
+                    <SelectItem value="Physique">Physique</SelectItem>
+                    <SelectItem value="Chimie">Chimie</SelectItem>
+                    <SelectItem value="Sciences">Sciences</SelectItem>
+                    <SelectItem value="Histoire">Histoire</SelectItem>
+                    <SelectItem value="Géographie">Géographie</SelectItem>
+                    <SelectItem value="Anglais">Anglais</SelectItem>
+                    <SelectItem value="Littérature">Littérature</SelectItem>
+                    <SelectItem value="Philosophie">Philosophie</SelectItem>
+                    <SelectItem value="Éducation Physique">
+                      Éducation Physique
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleEditTeacher}>Modifier l'enseignant</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </SidebarProvider>
-  )
+  );
 }
