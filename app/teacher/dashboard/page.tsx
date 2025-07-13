@@ -1,19 +1,45 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Clock, CheckCircle, AlertCircle, Calendar } from "lucide-react"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Calendar,
+  Wallet,
+} from "lucide-react";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default function TeacherDashboard() {
   const stats = [
     { title: "TD en attente", value: "3", icon: Clock, color: "bg-orange-500" },
-    { title: "TD en cours", value: "2", icon: AlertCircle, color: "bg-blue-500" },
-    { title: "TD terminés", value: "8", icon: CheckCircle, color: "bg-green-500" },
-    { title: "Cette semaine", value: "5", icon: Calendar, color: "bg-purple-500" },
-  ]
+    {
+      title: "TD en cours",
+      value: "2",
+      icon: AlertCircle,
+      color: "bg-blue-500",
+    },
+    { title: "Finance", value: "8", icon: Wallet, color: "bg-green-500" },
+    {
+      title: "Cette semaine",
+      value: "5",
+      icon: Calendar,
+      color: "bg-purple-500",
+    },
+  ];
 
   const pendingTD = [
     {
@@ -36,7 +62,7 @@ export default function TeacherDashboard() {
       students: 30,
       createdAt: "2024-01-16",
     },
-  ]
+  ];
 
   const activeTD = [
     {
@@ -49,19 +75,19 @@ export default function TeacherDashboard() {
       students: 22,
       status: "en_cours",
     },
-  ]
+  ];
 
   const handleConfirmTD = (id: number) => {
-    console.log(`TD ${id} confirmé`)
-  }
+    console.log(`TD ${id} confirmé`);
+  };
 
   const handleRejectTD = (id: number) => {
-    console.log(`TD ${id} rejeté`)
-  }
+    console.log(`TD ${id} rejeté`);
+  };
 
   const handleCompleteTD = (id: number) => {
-    console.log(`TD ${id} terminé`)
-  }
+    console.log(`TD ${id} finance`);
+  };
 
   return (
     <SidebarProvider>
@@ -71,7 +97,9 @@ export default function TeacherDashboard() {
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1">
             <h1 className="text-xl font-semibold">Dashboard Enseignant</h1>
-            <p className="text-sm text-muted-foreground">Bienvenue M. Kouassi Jean</p>
+            <p className="text-sm text-muted-foreground">
+              Bienvenue M. Kouassi Jean
+            </p>
           </div>
         </header>
 
@@ -81,7 +109,9 @@ export default function TeacherDashboard() {
             {stats.map((stat, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
                   <div className={`p-2 rounded-full ${stat.color}`}>
                     <stat.icon className="h-4 w-4 text-white" />
                   </div>
@@ -101,7 +131,9 @@ export default function TeacherDashboard() {
                   <Clock className="h-5 w-5 text-orange-500" />
                   TD en attente de confirmation
                 </CardTitle>
-                <CardDescription>Confirmez ou rejetez les TD qui vous sont assignés</CardDescription>
+                <CardDescription>
+                  Confirmez ou rejetez les TD qui vous sont assignés
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -135,7 +167,11 @@ export default function TeacherDashboard() {
                         >
                           Confirmer
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleRejectTD(td.id)}>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleRejectTD(td.id)}
+                        >
                           Rejeter
                         </Button>
                       </div>
@@ -152,7 +188,9 @@ export default function TeacherDashboard() {
                   <AlertCircle className="h-5 w-5 text-blue-500" />
                   TD en cours
                 </CardTitle>
-                <CardDescription>Marquez comme terminé une fois le TD fini</CardDescription>
+                <CardDescription>
+                  Marquez comme finance une fois le TD fini
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -180,7 +218,7 @@ export default function TeacherDashboard() {
                         onClick={() => handleCompleteTD(td.id)}
                         className="bg-green-600 hover:bg-green-700"
                       >
-                        Marquer comme terminé
+                        Marquer comme finance
                       </Button>
                     </div>
                   ))}
@@ -193,11 +231,21 @@ export default function TeacherDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Planning de la semaine</CardTitle>
-              <CardDescription>Vos TD programmés pour cette semaine</CardDescription>
+              <CardDescription>
+                Vos TD programmés pour cette semaine
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-7">
-                {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"].map((day, index) => (
+                {[
+                  "Lundi",
+                  "Mardi",
+                  "Mercredi",
+                  "Jeudi",
+                  "Vendredi",
+                  "Samedi",
+                  "Dimanche",
+                ].map((day, index) => (
                   <div key={day} className="p-3 border rounded-lg">
                     <h4 className="font-medium text-sm mb-2">{day}</h4>
                     {index < 3 ? (
@@ -218,5 +266,5 @@ export default function TeacherDashboard() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

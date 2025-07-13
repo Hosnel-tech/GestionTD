@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Calendar,
@@ -11,7 +11,8 @@ import {
   CheckCircle,
   GraduationCap,
   UserRound,
-} from "lucide-react"
+  Wallet,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,16 +24,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { usePathname } from "next/navigation"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 interface AppSidebarProps {
-  userRole: "admin" | "teacher" | "student"
+  userRole: "admin" | "teacher" | "student";
 }
 
 export function AppSidebar({ userRole }: AppSidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const getMenuItems = () => {
     switch (userRole) {
@@ -44,28 +45,28 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
           { title: "Apprenants", url: "/admin/students", icon: UserRound },
           { title: "Finances", url: "/admin/finances", icon: DollarSign },
           { title: "Paramètres", url: "/admin/settings", icon: Settings },
-        ]
+        ];
       case "teacher":
         return [
           { title: "Dashboard", url: "/teacher/dashboard", icon: Home },
-          { title: "Mes TD", url: "/teacher/td", icon: BookOpen },
+          { title: "En cours", url: "/teacher/td", icon: BookOpen },
           { title: "En attente", url: "/teacher/pending", icon: Clock },
-          { title: "Terminés", url: "/teacher/completed", icon: CheckCircle },
+          { title: "Finance", url: "/teacher/finances", icon: Wallet },
           { title: "Profil", url: "/teacher/profile", icon: Settings },
-        ]
+        ];
       case "student":
         return [
           { title: "Dashboard", url: "/student/dashboard", icon: Home },
           { title: "Mes TD", url: "/student/td", icon: BookOpen },
           { title: "Planning", url: "/student/schedule", icon: Calendar },
           { title: "Épreuves", url: "/student/exams", icon: FileText },
-        ]
+        ];
       default:
-        return []
+        return [];
     }
-  }
+  };
 
-  const menuItems = getMenuItems()
+  const menuItems = getMenuItems();
 
   return (
     <Sidebar>
@@ -76,7 +77,9 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
           </div>
           <div>
             <h2 className="text-lg font-semibold">EduTD Manager</h2>
-            <p className="text-sm text-muted-foreground capitalize">{userRole}</p>
+            <p className="text-sm text-muted-foreground capitalize">
+              {userRole}
+            </p>
           </div>
         </div>
       </SidebarHeader>
@@ -102,8 +105,10 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="p-4 text-center text-sm text-muted-foreground">© 2024 EduTD Manager</div>
+        <div className="p-4 text-center text-sm text-muted-foreground">
+          © 2024 EduTD Manager
+        </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
