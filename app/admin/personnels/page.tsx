@@ -53,13 +53,16 @@ import {
 
 export default function AdminTeachersPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [newTeacher, setNewTeacher] = useState({
+  const [newPersonnel, setNewPersonnel] = useState({
+    type: "",
     name: "",
     email: "",
     phone: "",
     school: "",
     class: "",
     subjects: "",
+    ifu: "",
+    accountNumber: "",
   });
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editTeacher, setEditTeacher] = useState<any>(null);
@@ -123,6 +126,14 @@ export default function AdminTeachersPage() {
     "Groupe Scolaire Excellence",
   ];
 
+  const personnelTypes = [
+    "Conseiller pédagogique",
+    "Enseignant",
+    "Surveillant général",
+    "Censeur",
+    "Directeur",
+  ];
+
   const getLevelBadge = (level: string) => {
     switch (level) {
       case "primaire":
@@ -145,16 +156,19 @@ export default function AdminTeachersPage() {
     }
   };
 
-  const handleCreateTeacher = () => {
-    console.log("Création enseignant:", newTeacher);
+  const handleCreatePersonnel = () => {
+    console.log("Création personnel:", newPersonnel);
     setShowCreateDialog(false);
-    setNewTeacher({
+    setNewPersonnel({
+      type: "",
       name: "",
       email: "",
       phone: "",
       school: "",
       class: "",
       subjects: "",
+      ifu: "",
+      accountNumber: "",
     });
   };
 
@@ -175,9 +189,9 @@ export default function AdminTeachersPage() {
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1">
-            <h1 className="text-xl font-semibold">Gestion des Enseignants</h1>
+            <h1 className="text-xl font-semibold">Gestion du Personnel</h1>
             <p className="text-sm text-muted-foreground">
-              Ajouter et gérer les enseignants de la plateforme
+              Ajouter et gérer les personnels de la plateforme
             </p>
           </div>
         </header>
@@ -188,7 +202,7 @@ export default function AdminTeachersPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher un enseignant..."
+                placeholder="Rechercher un membre..."
                 className="pl-10 w-64"
               />
             </div>
@@ -200,140 +214,277 @@ export default function AdminTeachersPage() {
                   Ajouter un personnel
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
                 <DialogHeader>
-                  <DialogTitle>Ajouter un nouvel enseignant</DialogTitle>
+                  <DialogTitle>Ajouter un personnel</DialogTitle>
                   <DialogDescription>
-                    Créez un compte pour un enseignant
+                    Créez un compte pour un personnel de l'établissement
                   </DialogDescription>
                 </DialogHeader>
-
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-4 py-4 overflow-y-auto flex-1 p-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nom et prénom</Label>
-                    <Input
-                      id="name"
-                      value={newTeacher.name}
-                      onChange={(e) =>
-                        setNewTeacher({ ...newTeacher, name: e.target.value })
-                      }
-                      placeholder="Ex: M. Kouassi Jean"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={newTeacher.email}
-                        onChange={(e) =>
-                          setNewTeacher({
-                            ...newTeacher,
-                            email: e.target.value,
-                          })
-                        }
-                        placeholder="email@exemple.com"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Numéro de téléphone</Label>
-                      <Input
-                        id="phone"
-                        value={newTeacher.phone}
-                        onChange={(e) =>
-                          setNewTeacher({
-                            ...newTeacher,
-                            phone: e.target.value,
-                          })
-                        }
-                        placeholder="+225 XX XX XX XX"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="school">Établissement</Label>
+                    <Label htmlFor="type">Type de personnel</Label>
                     <Select
-                      value={newTeacher.school}
+                      value={newPersonnel.type}
                       onValueChange={(value) =>
-                        setNewTeacher({ ...newTeacher, school: value })
+                        setNewPersonnel({ ...newPersonnel, type: value })
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un établissement" />
+                        <SelectValue placeholder="Sélectionner un type de personnel" />
                       </SelectTrigger>
                       <SelectContent>
-                        {schools.map((school) => (
-                          <SelectItem key={school} value={school}>
-                            {school}
+                        {personnelTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="class">Classe</Label>
-                    <Select
-                      value={newTeacher.class}
-                      onValueChange={(value) =>
-                        setNewTeacher({ ...newTeacher, class: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner une classe" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="CM2">CM2</SelectItem>
-                        <SelectItem value="3ème">3ème</SelectItem>
-                        <SelectItem value="Tle">Terminale</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="subjects">Matière enseignée</Label>
-                    <Select
-                      value={newTeacher.subjects}
-                      onValueChange={(value) =>
-                        setNewTeacher({ ...newTeacher, subjects: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner une matière" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Mathématiques">
-                          Mathématiques
-                        </SelectItem>
-                        <SelectItem value="Français">Français</SelectItem>
-                        <SelectItem value="Physique">Physique</SelectItem>
-                        <SelectItem value="Chimie">Chimie</SelectItem>
-                        <SelectItem value="Sciences">Sciences</SelectItem>
-                        <SelectItem value="Histoire">Histoire</SelectItem>
-                        <SelectItem value="Géographie">Géographie</SelectItem>
-                        <SelectItem value="Anglais">Anglais</SelectItem>
-                        <SelectItem value="Littérature">Littérature</SelectItem>
-                        <SelectItem value="Philosophie">Philosophie</SelectItem>
-                        <SelectItem value="Éducation Physique">
-                          Éducation Physique
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {/* Champs dynamiques selon le type de personnel */}
+                  {newPersonnel.type === "Enseignant" ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Nom et prénom</Label>
+                        <Input
+                          id="name"
+                          value={newPersonnel.name}
+                          onChange={(e) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              name: e.target.value,
+                            })
+                          }
+                          placeholder="Ex: M. Kouassi Jean"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={newPersonnel.email}
+                            onChange={(e) =>
+                              setNewPersonnel({
+                                ...newPersonnel,
+                                email: e.target.value,
+                              })
+                            }
+                            placeholder="email@exemple.com"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Numéro de téléphone</Label>
+                          <Input
+                            id="phone"
+                            value={newPersonnel.phone}
+                            onChange={(e) =>
+                              setNewPersonnel({
+                                ...newPersonnel,
+                                phone: e.target.value,
+                              })
+                            }
+                            placeholder="+225 XX XX XX XX"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="school">Établissement</Label>
+                        <Select
+                          value={newPersonnel.school}
+                          onValueChange={(value) =>
+                            setNewPersonnel({ ...newPersonnel, school: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un établissement" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {schools.map((school) => (
+                              <SelectItem key={school} value={school}>
+                                {school}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="subjects">Matière enseignée</Label>
+                        <Select
+                          value={newPersonnel.subjects}
+                          onValueChange={(value) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              subjects: value,
+                            })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner une matière" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Mathématiques">
+                              Mathématiques
+                            </SelectItem>
+                            <SelectItem value="Français">Français</SelectItem>
+                            <SelectItem value="Physique">Physique</SelectItem>
+                            <SelectItem value="Chimie">Chimie</SelectItem>
+                            <SelectItem value="Sciences">Sciences</SelectItem>
+                            <SelectItem value="Histoire">Histoire</SelectItem>
+                            <SelectItem value="Géographie">
+                              Géographie
+                            </SelectItem>
+                            <SelectItem value="Anglais">Anglais</SelectItem>
+                            <SelectItem value="Littérature">
+                              Littérature
+                            </SelectItem>
+                            <SelectItem value="Philosophie">
+                              Philosophie
+                            </SelectItem>
+                            <SelectItem value="Éducation Physique">
+                              Éducation Physique
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="ifu">IFU</Label>
+                        <Input
+                          id="ifu"
+                          value={newPersonnel.ifu}
+                          onChange={(e) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              ifu: e.target.value,
+                            })
+                          }
+                          placeholder="Numéro IFU"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="accountNumber">Numéro de compte</Label>
+                        <Input
+                          id="accountNumber"
+                          value={newPersonnel.accountNumber}
+                          onChange={(e) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              accountNumber: e.target.value,
+                            })
+                          }
+                          placeholder="Numéro de compte bancaire"
+                        />
+                      </div>
+                    </>
+                  ) : newPersonnel.type ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Nom et prénom</Label>
+                        <Input
+                          id="name"
+                          value={newPersonnel.name}
+                          onChange={(e) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              name: e.target.value,
+                            })
+                          }
+                          placeholder="Ex: M. Kouassi Jean"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={newPersonnel.email}
+                            onChange={(e) =>
+                              setNewPersonnel({
+                                ...newPersonnel,
+                                email: e.target.value,
+                              })
+                            }
+                            placeholder="email@exemple.com"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Numéro de téléphone</Label>
+                          <Input
+                            id="phone"
+                            value={newPersonnel.phone}
+                            onChange={(e) =>
+                              setNewPersonnel({
+                                ...newPersonnel,
+                                phone: e.target.value,
+                              })
+                            }
+                            placeholder="+225 XX XX XX XX"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="school">Établissement</Label>
+                        <Select
+                          value={newPersonnel.school}
+                          onValueChange={(value) =>
+                            setNewPersonnel({ ...newPersonnel, school: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un établissement" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {schools.map((school) => (
+                              <SelectItem key={school} value={school}>
+                                {school}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="ifu">IFU</Label>
+                        <Input
+                          id="ifu"
+                          value={newPersonnel.ifu}
+                          onChange={(e) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              ifu: e.target.value,
+                            })
+                          }
+                          placeholder="Numéro IFU"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="accountNumber">Numéro de compte</Label>
+                        <Input
+                          id="accountNumber"
+                          value={newPersonnel.accountNumber}
+                          onChange={(e) =>
+                            setNewPersonnel({
+                              ...newPersonnel,
+                              accountNumber: e.target.value,
+                            })
+                          }
+                          placeholder="Numéro de compte bancaire"
+                        />
+                      </div>
+                    </>
+                  ) : null}
                 </div>
-
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 mt-4">
                   <Button
                     variant="outline"
                     onClick={() => setShowCreateDialog(false)}
                   >
                     Annuler
                   </Button>
-                  <Button onClick={handleCreateTeacher}>
-                    Créer l'enseignant
+                  <Button onClick={handleCreatePersonnel}>
+                    Créer le personnel
                   </Button>
                 </div>
               </DialogContent>
