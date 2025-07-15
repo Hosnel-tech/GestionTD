@@ -18,8 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BookOpen, GraduationCap, Users } from "lucide-react";
+import { BookOpen, GraduationCap, Users, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({
@@ -27,17 +29,41 @@ export default function LoginPage() {
     password: "",
     role: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
+  const { login, user } = useAuth();
 
-  const handleLogin = () => {
-    // Simulation de connexion
-    if (credentials.role === "admin") {
-      router.push("/admin/dashboard");
-    } else if (credentials.role === "teacher") {
-      router.push("/teacher/dashboard");
-    } else if (credentials.role === "student") {
-      router.push("/student/dashboard");
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      if (user.role === "admin") {
+        router.push("/admin/dashboard");
+      } else if (user.role === "teacher") {
+        router.push("/teacher/dashboard");
+      } else if (user.role === "student") {
+        router.push("/student/dashboard");
+      }
     }
+  }, [user, router]);
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+    setError("");
+
+    const result = await login(
+      credentials.email,
+      credentials.password,
+      credentials.role,
+    );
+
+    if (result.success) {
+      // Navigation will be handled by the useEffect above
+    } else {
+      setError(result.error || "Erreur de connexion");
+    }
+
+    setIsLoading(false);
   };
 
   return (
