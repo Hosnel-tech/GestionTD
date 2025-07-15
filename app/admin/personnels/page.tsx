@@ -63,9 +63,12 @@ export default function AdminTeachersPage() {
     subjects: "",
     ifu: "",
     accountNumber: "",
+    level: "",
   });
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editTeacher, setEditTeacher] = useState<any>(null);
+  // Ajout de l'état pour le filtre de type de personnel
+  const [selectedType, setSelectedType] = useState<string>("");
 
   const teachers = [
     {
@@ -76,9 +79,12 @@ export default function AdminTeachersPage() {
       school: "Collège Moderne de Cocody",
       class: "3ème, Tle",
       level: "secondaire",
-      subjects: "Mathématiques, Physique",
+      subjects: "Mathématiques",
       paymentMethod: "banque",
       status: "active",
+      ifu: "IFU123456",
+      accountNumber: "1234567890",
+      type: "Enseignant",
     },
     {
       id: 2,
@@ -88,9 +94,12 @@ export default function AdminTeachersPage() {
       school: "Lycée Technique d'Abidjan",
       class: "3ème",
       level: "secondaire",
-      subjects: "Français, Littérature",
+      subjects: "Français",
       paymentMethod: "electronique",
       status: "active",
+      ifu: "IFU654321",
+      accountNumber: "0987654321",
+      type: "Enseignant",
     },
     {
       id: 3,
@@ -100,9 +109,12 @@ export default function AdminTeachersPage() {
       school: "École Primaire Les Palmiers",
       class: "CM2",
       level: "primaire",
-      subjects: "Sciences, Mathématiques",
+      subjects: "Sciences",
       paymentMethod: "banque",
       status: "active",
+      ifu: "IFU112233",
+      accountNumber: "1122334455",
+      type: "Enseignant",
     },
     {
       id: 4,
@@ -112,11 +124,123 @@ export default function AdminTeachersPage() {
       school: "Collège Sainte-Marie",
       class: "Tle",
       level: "secondaire",
-      subjects: "Histoire, Géographie",
+      subjects: "Histoire",
       paymentMethod: "electronique",
       status: "inactive",
+      ifu: "IFU998877",
+      accountNumber: "9988776655",
+      type: "Enseignant",
+    },
+    // Conseiller pédagogique
+    {
+      id: 5,
+      name: "M. Yao Bernard",
+      email: "yao.bernard@edutd.com",
+      phone: "+225 09 11 22 33",
+      school: "Groupe Scolaire Excellence",
+      paymentMethod: "banque",
+      status: "active",
+      ifu: "IFU445566",
+      accountNumber: "4455667788",
+      type: "Conseiller pédagogique",
+    },
+    {
+      id: 6,
+      name: "Mme Akissi Florence",
+      email: "akissi.florence@edutd.com",
+      phone: "+225 08 22 33 44",
+      school: "Collège Moderne de Cocody",
+      paymentMethod: "electronique",
+      status: "active",
+      ifu: "IFU556677",
+      accountNumber: "5566778899",
+      type: "Conseiller pédagogique",
+    },
+    // Surveillant général
+    {
+      id: 7,
+      name: "M. Koffi Serge",
+      email: "koffi.serge@edutd.com",
+      phone: "+225 06 33 44 55",
+      school: "Lycée Technique d'Abidjan",
+      paymentMethod: "banque",
+      status: "active",
+      ifu: "IFU667788",
+      accountNumber: "6677889900",
+      type: "Surveillant général",
+    },
+    {
+      id: 8,
+      name: "Mme N'Dri Awa",
+      email: "ndri.awa@edutd.com",
+      phone: "+225 05 44 55 66",
+      school: "Collège Sainte-Marie",
+      paymentMethod: "electronique",
+      status: "inactive",
+      ifu: "IFU778899",
+      accountNumber: "7788990011",
+      type: "Surveillant général",
+    },
+    // Censeur
+    {
+      id: 9,
+      name: "M. Kouamé Michel",
+      email: "kouame.michel@edutd.com",
+      phone: "+225 04 55 66 77",
+      school: "École Primaire Les Palmiers",
+      paymentMethod: "banque",
+      status: "active",
+      ifu: "IFU889900",
+      accountNumber: "8899001122",
+      type: "Censeur",
+    },
+    {
+      id: 10,
+      name: "Mme Tano Elise",
+      email: "tano.elise@edutd.com",
+      phone: "+225 03 66 77 88",
+      school: "Groupe Scolaire Excellence",
+      paymentMethod: "electronique",
+      status: "active",
+      ifu: "IFU990011",
+      accountNumber: "9900112233",
+      type: "Censeur",
+    },
+    // Directeur
+    {
+      id: 11,
+      name: "M. Ouattara Idriss",
+      email: "ouattara.idriss@edutd.com",
+      phone: "+225 02 77 88 99",
+      school: "Collège Moderne de Cocody",
+      paymentMethod: "banque",
+      status: "active",
+      ifu: "IFU001122",
+      accountNumber: "0011223344",
+      type: "Directeur",
+    },
+    {
+      id: 12,
+      name: "Mme Soro Aminata",
+      email: "soro.aminata@edutd.com",
+      phone: "+225 01 88 99 00",
+      school: "Lycée Technique d'Abidjan",
+      paymentMethod: "electronique",
+      status: "inactive",
+      ifu: "IFU112233",
+      accountNumber: "1122334455",
+      type: "Directeur",
     },
   ];
+
+  // Pour la démo, on suppose que tous les éléments de 'teachers' sont des 'Enseignant'.
+  // Pour un vrai usage, il faudrait un champ 'type' dans chaque objet.
+  // On adapte la démo pour permettre le filtre.
+  const personnels = teachers;
+
+  const filteredPersonnels = selectedType
+    ? personnels.filter((p) => p.type === selectedType)
+    : personnels;
 
   const schools = [
     "Collège Moderne de Cocody",
@@ -169,6 +293,7 @@ export default function AdminTeachersPage() {
       subjects: "",
       ifu: "",
       accountNumber: "",
+      level: "",
     });
   };
 
@@ -199,12 +324,27 @@ export default function AdminTeachersPage() {
         <div className="flex-1 space-y-6 p-6">
           {/* Header Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher un membre..."
-                className="pl-10 w-64"
-              />
+            <div className="flex gap-4 items-center">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un membre..."
+                  className="pl-10 w-64"
+                />
+              </div>
+              {/* Filtre par type de personnel */}
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Filtrer par type de personnel" />
+                </SelectTrigger>
+                <SelectContent>
+                  {personnelTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -307,6 +447,25 @@ export default function AdminTeachersPage() {
                                 {school}
                               </SelectItem>
                             ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="level">Niveau</Label>
+                        <Select
+                          value={newPersonnel.level}
+                          onValueChange={(value) =>
+                            setNewPersonnel({ ...newPersonnel, level: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un niveau" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="secondaire">
+                              Secondaire
+                            </SelectItem>
+                            <SelectItem value="primaire">Primaire</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -491,12 +650,17 @@ export default function AdminTeachersPage() {
             </Dialog>
           </div>
 
-          {/* Teachers Table */}
+          {/* Table des personnels */}
           <Card>
             <CardHeader>
-              <CardTitle>Liste des enseignants</CardTitle>
+              <CardTitle>
+                Liste des{" "}
+                {selectedType ? selectedType.toLowerCase() + "s" : "personnels"}
+              </CardTitle>
               <CardDescription>
-                Gérez tous les enseignants de la plateforme
+                Gérez tous les{" "}
+                {selectedType ? selectedType.toLowerCase() + "s" : "personnels"}{" "}
+                de la plateforme
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -506,62 +670,90 @@ export default function AdminTeachersPage() {
                     <TableHead>Nom</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>Établissement</TableHead>
-                    <TableHead>Niveau</TableHead>
-                    <TableHead>Classe(s)</TableHead>
-                    <TableHead>Matières</TableHead>
+                    {selectedType === "" || selectedType === "Enseignant" ? (
+                      <>
+                        <TableHead>Niveau</TableHead>
+                        <TableHead>Matières</TableHead>
+                      </>
+                    ) : null}
+                    <TableHead>IFU</TableHead>
+                    <TableHead>Numéro de compte</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {teachers.map((teacher) => (
-                    <TableRow key={teacher.id}>
-                      <TableCell className="font-medium">
-                        {teacher.name}
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div className="flex items-center gap-1">
-                            <Mail className="h-3 w-3" />
-                            <span>{teacher.email}</span>
-                          </div>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Phone className="h-3 w-3" />
-                            <span>{teacher.phone}</span>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Building className="h-3 w-3" />
-                          <span>{teacher.school}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{getLevelBadge(teacher.level)}</TableCell>
-                      <TableCell>{teacher.class}</TableCell>
-                      <TableCell>{teacher.subjects}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditTeacher(teacher);
-                              setShowEditDialog(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                  {filteredPersonnels.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={
+                          selectedType === "" || selectedType === "Enseignant"
+                            ? 8
+                            : 6
+                        }
+                        className="text-center text-muted-foreground"
+                      >
+                        Aucun personnel trouvé pour ce type.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredPersonnels.map((teacher) => (
+                      <TableRow key={teacher.id}>
+                        <TableCell className="font-medium">
+                          {teacher.name}
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <div className="flex items-center gap-1">
+                              <Mail className="h-3 w-3" />
+                              <span>{teacher.email}</span>
+                            </div>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Phone className="h-3 w-3" />
+                              <span>{teacher.phone}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <Building className="h-3 w-3" />
+                            <span>{teacher.school}</span>
+                          </div>
+                        </TableCell>
+                        {selectedType === "" ||
+                        selectedType === "Enseignant" ? (
+                          <>
+                            <TableCell>
+                              {getLevelBadge(teacher.level || "")}
+                            </TableCell>
+                            <TableCell>{teacher.subjects}</TableCell>
+                          </>
+                        ) : null}
+                        <TableCell>{teacher.ifu || "-"}</TableCell>
+                        <TableCell>{teacher.accountNumber || "-"}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditTeacher(teacher);
+                                setShowEditDialog(true);
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -570,7 +762,7 @@ export default function AdminTeachersPage() {
       </SidebarInset>
       {/* Dialog pour édition enseignant */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Modifier l'enseignant</DialogTitle>
             <DialogDescription>
@@ -578,112 +770,146 @@ export default function AdminTeachersPage() {
             </DialogDescription>
           </DialogHeader>
           {editTeacher && (
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom et prénom</Label>
-                <Input
-                  id="name"
-                  value={editTeacher.name}
-                  onChange={(e) =>
-                    setEditTeacher({ ...editTeacher, name: e.target.value })
-                  }
-                  placeholder="Ex: M. Kouassi Jean"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid gap-4 h-full">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="name">Nom et prénom</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={editTeacher.email}
+                    id="name"
+                    value={editTeacher.name}
                     onChange={(e) =>
-                      setEditTeacher({ ...editTeacher, email: e.target.value })
+                      setEditTeacher({ ...editTeacher, name: e.target.value })
                     }
-                    placeholder="email@exemple.com"
+                    placeholder="Ex: M. Kouassi Jean"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Numéro de téléphone</Label>
-                  <Input
-                    id="phone"
-                    value={editTeacher.phone}
-                    onChange={(e) =>
-                      setEditTeacher({ ...editTeacher, phone: e.target.value })
-                    }
-                    placeholder="+225 XX XX XX XX"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={editTeacher.email}
+                      onChange={(e) =>
+                        setEditTeacher({
+                          ...editTeacher,
+                          email: e.target.value,
+                        })
+                      }
+                      placeholder="email@exemple.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Numéro de téléphone</Label>
+                    <Input
+                      id="phone"
+                      value={editTeacher.phone}
+                      onChange={(e) =>
+                        setEditTeacher({
+                          ...editTeacher,
+                          phone: e.target.value,
+                        })
+                      }
+                      placeholder="+225 XX XX XX XX"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="school">Établissement</Label>
-                <Select
-                  value={editTeacher.school}
-                  onValueChange={(value) =>
-                    setEditTeacher({ ...editTeacher, school: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un établissement" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {schools.map((school) => (
-                      <SelectItem key={school} value={school}>
-                        {school}
+                <div className="space-y-2">
+                  <Label htmlFor="school">Établissement</Label>
+                  <Select
+                    value={editTeacher.school}
+                    onValueChange={(value) =>
+                      setEditTeacher({ ...editTeacher, school: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un établissement" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {schools.map((school) => (
+                        <SelectItem key={school} value={school}>
+                          {school}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="level">Niveau</Label>
+                  <Select
+                    value={editTeacher.level}
+                    onValueChange={(value) =>
+                      setEditTeacher({ ...editTeacher, level: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un niveau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="secondaire">Secondaire</SelectItem>
+                      <SelectItem value="primaire">Primaire</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="subjects">Matière enseignée</Label>
+                  <Select
+                    value={editTeacher.subjects}
+                    onValueChange={(value) =>
+                      setEditTeacher({ ...editTeacher, subjects: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une matière" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Mathématiques">
+                        Mathématiques
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="class">Classe</Label>
-                <Select
-                  value={editTeacher.class}
-                  onValueChange={(value) =>
-                    setEditTeacher({ ...editTeacher, class: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une classe" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="CM2">CM2</SelectItem>
-                    <SelectItem value="3ème">3ème</SelectItem>
-                    <SelectItem value="Tle">Terminale</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="subjects">Matière enseignée</Label>
-                <Select
-                  value={editTeacher.subjects}
-                  onValueChange={(value) =>
-                    setEditTeacher({ ...editTeacher, subjects: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une matière" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Mathématiques">Mathématiques</SelectItem>
-                    <SelectItem value="Français">Français</SelectItem>
-                    <SelectItem value="Physique">Physique</SelectItem>
-                    <SelectItem value="Chimie">Chimie</SelectItem>
-                    <SelectItem value="Sciences">Sciences</SelectItem>
-                    <SelectItem value="Histoire">Histoire</SelectItem>
-                    <SelectItem value="Géographie">Géographie</SelectItem>
-                    <SelectItem value="Anglais">Anglais</SelectItem>
-                    <SelectItem value="Littérature">Littérature</SelectItem>
-                    <SelectItem value="Philosophie">Philosophie</SelectItem>
-                    <SelectItem value="Éducation Physique">
-                      Éducation Physique
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                      <SelectItem value="Français">Français</SelectItem>
+                      <SelectItem value="Physique">Physique</SelectItem>
+                      <SelectItem value="Chimie">Chimie</SelectItem>
+                      <SelectItem value="Sciences">Sciences</SelectItem>
+                      <SelectItem value="Histoire">Histoire</SelectItem>
+                      <SelectItem value="Géographie">Géographie</SelectItem>
+                      <SelectItem value="Anglais">Anglais</SelectItem>
+                      <SelectItem value="Littérature">Littérature</SelectItem>
+                      <SelectItem value="Philosophie">Philosophie</SelectItem>
+                      <SelectItem value="Éducation Physique">
+                        Éducation Physique
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ifu">IFU</Label>
+                  <Input
+                    id="ifu"
+                    value={editTeacher.ifu}
+                    onChange={(e) =>
+                      setEditTeacher({ ...editTeacher, ifu: e.target.value })
+                    }
+                    placeholder="Numéro IFU"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="accountNumber">Numéro de compte</Label>
+                  <Input
+                    id="accountNumber"
+                    value={editTeacher.accountNumber}
+                    onChange={(e) =>
+                      setEditTeacher({
+                        ...editTeacher,
+                        accountNumber: e.target.value,
+                      })
+                    }
+                    placeholder="Numéro de compte bancaire"
+                  />
+                </div>
               </div>
             </div>
           )}
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 p-6 border-t bg-background">
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
               Annuler
             </Button>
