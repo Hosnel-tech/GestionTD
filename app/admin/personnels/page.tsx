@@ -90,6 +90,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU123456",
       accountNumber: "1234567890",
       type: "Enseignant",
+      bank: "Banque Atlantique",
     },
     {
       id: 2,
@@ -105,6 +106,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU654321",
       accountNumber: "0987654321",
       type: "Enseignant",
+      bank: "SGBCI",
     },
     {
       id: 3,
@@ -120,6 +122,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU112233",
       accountNumber: "1122334455",
       type: "Enseignant",
+      bank: "Ecobank",
     },
     {
       id: 4,
@@ -135,6 +138,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU998877",
       accountNumber: "9988776655",
       type: "Enseignant",
+      bank: "Banque Atlantique",
     },
     // Conseiller pédagogique
     {
@@ -148,6 +152,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU445566",
       accountNumber: "4455667788",
       type: "Conseiller pédagogique",
+      bank: "SGBCI",
     },
     {
       id: 6,
@@ -160,6 +165,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU556677",
       accountNumber: "5566778899",
       type: "Conseiller pédagogique",
+      bank: "Ecobank",
     },
     // Surveillant général
     {
@@ -173,6 +179,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU667788",
       accountNumber: "6677889900",
       type: "Surveillant général",
+      bank: "Banque Atlantique",
     },
     {
       id: 8,
@@ -185,6 +192,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU778899",
       accountNumber: "7788990011",
       type: "Surveillant général",
+      bank: "SGBCI",
     },
     // Censeur
     {
@@ -198,6 +206,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU889900",
       accountNumber: "8899001122",
       type: "Censeur",
+      bank: "Ecobank",
     },
     {
       id: 10,
@@ -210,6 +219,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU990011",
       accountNumber: "9900112233",
       type: "Censeur",
+      bank: "Banque Atlantique",
     },
     // Directeur
     {
@@ -223,6 +233,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU001122",
       accountNumber: "0011223344",
       type: "Directeur",
+      bank: "SGBCI",
     },
     {
       id: 12,
@@ -235,6 +246,7 @@ export default function AdminTeachersPage() {
       ifu: "IFU112233",
       accountNumber: "1122334455",
       type: "Directeur",
+      bank: "Ecobank",
     },
   ];
 
@@ -765,6 +777,7 @@ export default function AdminTeachersPage() {
                     <TableHead>Nom</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>Établissement</TableHead>
+                    <TableHead>Banque</TableHead>
                     {selectedType === "" || selectedType === "Enseignant" ? (
                       <>
                         <TableHead>Niveau</TableHead>
@@ -782,8 +795,8 @@ export default function AdminTeachersPage() {
                       <TableCell
                         colSpan={
                           selectedType === "" || selectedType === "Enseignant"
-                            ? 8
-                            : 6
+                            ? 9
+                            : 7
                         }
                         className="text-center text-muted-foreground"
                       >
@@ -814,6 +827,7 @@ export default function AdminTeachersPage() {
                             <span>{teacher.school}</span>
                           </div>
                         </TableCell>
+                        <TableCell>{teacher.bank || "-"}</TableCell>
                         {selectedType === "" ||
                         selectedType === "Enseignant" ? (
                           <>
