@@ -505,63 +505,10 @@ export default function AdminFinancesPage() {
                             Taux horaire
                           </TableHead>
                           <TableHead
-                            colSpan={2}
+                            rowSpan={3}
                             className="text-center border-r"
                           >
-                            Montant
-                          </TableHead>
-                          <TableHead rowSpan={3}>Paiement</TableHead>
-                        </TableRow>
-                        <TableRow>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Lundi
-                          </TableHead>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Mardi
-                          </TableHead>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Mercredi
-                          </TableHead>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Jeudi
-                          </TableHead>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Vendredi
-                          </TableHead>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Samedi
-                          </TableHead>
-                          <TableHead
-                            colSpan={2}
-                            className="text-center border-r"
-                          >
-                            Total
-                          </TableHead>
-                          <TableHead className="text-center">3ème</TableHead>
-                          <TableHead className="text-center border-r">
-                            Tle
-                          </TableHead>
-                          <TableHead className="text-center">3ème</TableHead>
-                          <TableHead className="text-center border-r">
-                            Tle
+                            Montant total
                           </TableHead>
                         </TableRow>
                         <TableRow>
@@ -596,10 +543,6 @@ export default function AdminFinancesPage() {
                           <TableHead className="text-center">6000</TableHead>
                           <TableHead className="text-center border-r">
                             7000
-                          </TableHead>
-                          <TableHead className="text-center">3ème</TableHead>
-                          <TableHead className="text-center border-r">
-                            Tle
                           </TableHead>
                         </TableRow>
                       </TableHeader>
@@ -666,31 +609,31 @@ export default function AdminFinancesPage() {
                                 {teacher.rates?.["Tle"]?.toLocaleString?.() ??
                                   0}
                               </TableCell>
-                              <TableCell className="text-center">
-                                {teacher.amount?.["3ème"]?.toLocaleString?.() ??
-                                  0}
-                              </TableCell>
-                              <TableCell className="text-center border-r">
-                                {teacher.amount?.["Tle"]?.toLocaleString?.() ??
-                                  0}
-                              </TableCell>
-                              <TableCell>
-                                <Button
-                                  size="sm"
-                                  variant={
-                                    teacher.paid ? "secondary" : "default"
-                                  }
-                                  disabled={teacher.paid}
-                                  onClick={() => handlePayment(teacher.name)}
-                                >
-                                  {teacher.paid ? "Payé" : "Payer"}
-                                </Button>
+                              <TableCell className="text-center border-r font-bold">
+                                {teacher.amount?.total?.toLocaleString?.() ?? 0}{" "}
+                                FCFA
                               </TableCell>
                             </TableRow>
                           )
                         )}
                       </TableBody>
                     </Table>
+                    {/* Bouton paiement global */}
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          currentData.secondaryTeachers.forEach((teacher) =>
+                            handlePayment(teacher.name)
+                          );
+                        }}
+                        disabled={currentData.secondaryTeachers.every(
+                          (teacher) => teacher.paid
+                        )}
+                      >
+                        Payer
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

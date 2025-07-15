@@ -65,6 +65,7 @@ export default function AdminTeachersPage() {
     ifu: "",
     accountNumber: "",
     level: "",
+    bank: "",
   });
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editTeacher, setEditTeacher] = useState<any>(null);
@@ -262,6 +263,8 @@ export default function AdminTeachersPage() {
     "Directeur",
   ];
 
+  const banks = ["Banque Atlantique", "SGBCI", "Ecobank"];
+
   const getLevelBadge = (level: string) => {
     switch (level) {
       case "primaire":
@@ -298,6 +301,7 @@ export default function AdminTeachersPage() {
       ifu: "",
       accountNumber: "",
       level: "",
+      bank: "",
     });
   };
 
@@ -349,6 +353,53 @@ export default function AdminTeachersPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <input
+                type="file"
+                accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                style={{ display: "none" }}
+                ref={fileInputRef}
+                onChange={(e) => {
+                  setImportError("");
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const allowedTypes = [
+                      "text/csv",
+                      "application/vnd.ms-excel",
+                      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    ];
+                    const allowedExtensions = [".csv", ".xls", ".xlsx"];
+                    const ext = file.name
+                      .slice(file.name.lastIndexOf("."))
+                      .toLowerCase();
+                    if (
+                      allowedTypes.includes(file.type) ||
+                      allowedExtensions.includes(ext)
+                    ) {
+                      setImportFile(file);
+                    } else {
+                      setImportFile(null);
+                      setImportError(
+                        "Seuls les fichiers CSV ou Excel sont acceptés."
+                      );
+                    }
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Importer CSV/Excel
+              </Button>
+              {importFile && (
+                <span className="text-xs text-muted-foreground">
+                  Fichier sélectionné : {importFile.name}
+                </span>
+              )}
+              {importError && (
+                <span className="text-xs text-destructive">{importError}</span>
+              )}
             </div>
 
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -449,6 +500,26 @@ export default function AdminTeachersPage() {
                             {schools.map((school) => (
                               <SelectItem key={school} value={school}>
                                 {school}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="bank">Banque</Label>
+                        <Select
+                          value={newPersonnel.bank}
+                          onValueChange={(value) =>
+                            setNewPersonnel({ ...newPersonnel, bank: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner une banque" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {banks.map((bank) => (
+                              <SelectItem key={bank} value={bank}>
+                                {bank}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -609,6 +680,26 @@ export default function AdminTeachersPage() {
                         </Select>
                       </div>
                       <div className="space-y-2">
+                        <Label htmlFor="bank">Banque</Label>
+                        <Select
+                          value={newPersonnel.bank}
+                          onValueChange={(value) =>
+                            setNewPersonnel({ ...newPersonnel, bank: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner une banque" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {banks.map((bank) => (
+                              <SelectItem key={bank} value={bank}>
+                                {bank}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
                         <Label htmlFor="ifu">IFU</Label>
                         <Input
                           id="ifu"
@@ -640,57 +731,6 @@ export default function AdminTeachersPage() {
                   ) : null}
                 </div>
                 <div className="flex justify-end gap-2 mt-4">
-                  <div className="flex flex-col gap-2 items-end w-full mb-2">
-                    <input
-                      type="file"
-                      accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                      style={{ display: "none" }}
-                      ref={fileInputRef}
-                      onChange={(e) => {
-                        setImportError("");
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const allowedTypes = [
-                            "text/csv",
-                            "application/vnd.ms-excel",
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                          ];
-                          const allowedExtensions = [".csv", ".xls", ".xlsx"];
-                          const ext = file.name
-                            .slice(file.name.lastIndexOf("."))
-                            .toLowerCase();
-                          if (
-                            allowedTypes.includes(file.type) ||
-                            allowedExtensions.includes(ext)
-                          ) {
-                            setImportFile(file);
-                          } else {
-                            setImportFile(null);
-                            setImportError(
-                              "Seuls les fichiers CSV ou Excel sont acceptés."
-                            );
-                          }
-                        }
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Importer CSV/Excel
-                    </Button>
-                    {importFile && (
-                      <span className="text-xs text-muted-foreground">
-                        Fichier sélectionné : {importFile.name}
-                      </span>
-                    )}
-                    {importError && (
-                      <span className="text-xs text-destructive">
-                        {importError}
-                      </span>
-                    )}
-                  </div>
                   <Button
                     variant="outline"
                     onClick={() => setShowCreateDialog(false)}
