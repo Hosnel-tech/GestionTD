@@ -70,7 +70,7 @@ export default function AdminTeachersPage() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editTeacher, setEditTeacher] = useState<any>(null);
   // Ajout de l'état pour le filtre de type de personnel
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("Enseignant");
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importError, setImportError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
