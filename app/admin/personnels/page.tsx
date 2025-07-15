@@ -197,7 +197,7 @@ export default function AdminTeachersPage() {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Ajouter un enseignant
+                  Ajouter un personnel
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">

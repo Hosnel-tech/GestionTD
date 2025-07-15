@@ -1,12 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -14,14 +26,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { Plus, Search, Filter, Edit, Trash2, Mail } from "lucide-react"
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Plus, Search, Filter, Edit, Trash2, Mail } from "lucide-react";
 
 export default function AdminUsersPage() {
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -30,7 +53,7 @@ export default function AdminUsersPage() {
     level: "",
     paymentMethod: "",
     subjects: "",
-  })
+  });
 
   const users = [
     {
@@ -72,24 +95,24 @@ export default function AdminUsersPage() {
       paymentMethod: "banque",
       status: "active",
     },
-  ]
+  ];
 
   const getRoleBadge = (role: string) => {
     switch (role) {
       case "teacher":
-        return <Badge variant="default">Enseignant</Badge>
+        return <Badge variant="default">Enseignant</Badge>;
       case "student":
-        return <Badge variant="secondary">Apprenant</Badge>
+        return <Badge variant="secondary">Apprenant</Badge>;
       case "admin":
-        return <Badge className="bg-purple-600">Administrateur</Badge>
+        return <Badge className="bg-purple-600">Administrateur</Badge>;
       default:
-        return <Badge variant="outline">{role}</Badge>
+        return <Badge variant="outline">{role}</Badge>;
     }
-  }
+  };
 
   const handleCreateUser = () => {
-    console.log("Création utilisateur:", newUser)
-    setShowCreateDialog(false)
+    console.log("Création utilisateur:", newUser);
+    setShowCreateDialog(false);
     setNewUser({
       name: "",
       email: "",
@@ -98,12 +121,12 @@ export default function AdminUsersPage() {
       level: "",
       paymentMethod: "",
       subjects: "",
-    })
-  }
+    });
+  };
 
   const sendCredentials = (userId: number) => {
-    console.log(`Envoi des identifiants pour l'utilisateur ${userId}`)
-  }
+    console.log(`Envoi des identifiants pour l'utilisateur ${userId}`);
+  };
 
   return (
     <SidebarProvider>
@@ -113,7 +136,9 @@ export default function AdminUsersPage() {
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1">
             <h1 className="text-xl font-semibold">Gestion des Utilisateurs</h1>
-            <p className="text-sm text-muted-foreground">Ajouter et gérer les enseignants et apprenants</p>
+            <p className="text-sm text-muted-foreground">
+              Ajouter et gérer les enseignants et apprenants
+            </p>
           </div>
         </header>
 
@@ -123,7 +148,10 @@ export default function AdminUsersPage() {
             <div className="flex gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Rechercher un utilisateur..." className="pl-10 w-64" />
+                <Input
+                  placeholder="Rechercher un utilisateur..."
+                  className="pl-10 w-64"
+                />
               </div>
               <Button variant="outline">
                 <Filter className="h-4 w-4 mr-2" />
@@ -141,7 +169,9 @@ export default function AdminUsersPage() {
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Ajouter un nouvel utilisateur</DialogTitle>
-                  <DialogDescription>Créez un compte pour un enseignant ou un apprenant</DialogDescription>
+                  <DialogDescription>
+                    Créez un compte pour un enseignant ou un apprenant
+                  </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
@@ -151,7 +181,9 @@ export default function AdminUsersPage() {
                       <Input
                         id="name"
                         value={newUser.name}
-                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                        onChange={(e) =>
+                          setNewUser({ ...newUser, name: e.target.value })
+                        }
                         placeholder="Ex: M. Kouassi Jean"
                       />
                     </div>
@@ -161,7 +193,9 @@ export default function AdminUsersPage() {
                         id="email"
                         type="email"
                         value={newUser.email}
-                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                        onChange={(e) =>
+                          setNewUser({ ...newUser, email: e.target.value })
+                        }
                         placeholder="email@exemple.com"
                       />
                     </div>
@@ -169,7 +203,12 @@ export default function AdminUsersPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="role">Rôle</Label>
-                    <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value })}>
+                    <Select
+                      value={newUser.role}
+                      onValueChange={(value) =>
+                        setNewUser({ ...newUser, role: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un rôle" />
                       </SelectTrigger>
@@ -186,14 +225,20 @@ export default function AdminUsersPage() {
                         <Label htmlFor="level">Niveau d'enseignement</Label>
                         <Select
                           value={newUser.level}
-                          onValueChange={(value) => setNewUser({ ...newUser, level: value })}
+                          onValueChange={(value) =>
+                            setNewUser({ ...newUser, level: value })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionner le niveau" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="primaire">Primaire (CM2)</SelectItem>
-                            <SelectItem value="secondaire">Secondaire (3ème, Tle)</SelectItem>
+                            <SelectItem value="primaire">
+                              Primaire (CM2)
+                            </SelectItem>
+                            <SelectItem value="secondaire">
+                              Secondaire (3ème, Tle)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -203,7 +248,9 @@ export default function AdminUsersPage() {
                         <Input
                           id="subjects"
                           value={newUser.subjects}
-                          onChange={(e) => setNewUser({ ...newUser, subjects: e.target.value })}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, subjects: e.target.value })
+                          }
                           placeholder="Ex: Mathématiques, Physique"
                         />
                       </div>
@@ -212,14 +259,18 @@ export default function AdminUsersPage() {
                         <Label htmlFor="paymentMethod">Mode de paiement</Label>
                         <Select
                           value={newUser.paymentMethod}
-                          onValueChange={(value) => setNewUser({ ...newUser, paymentMethod: value })}
+                          onValueChange={(value) =>
+                            setNewUser({ ...newUser, paymentMethod: value })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionner le mode de paiement" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="banque">Par banque</SelectItem>
-                            <SelectItem value="electronique">Paiement électronique</SelectItem>
+                            <SelectItem value="electronique">
+                              Paiement électronique
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -229,7 +280,12 @@ export default function AdminUsersPage() {
                   {newUser.role === "student" && (
                     <div className="space-y-2">
                       <Label htmlFor="class">Classe</Label>
-                      <Select value={newUser.class} onValueChange={(value) => setNewUser({ ...newUser, class: value })}>
+                      <Select
+                        value={newUser.class}
+                        onValueChange={(value) =>
+                          setNewUser({ ...newUser, class: value })
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner une classe" />
                         </SelectTrigger>
@@ -244,10 +300,15 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCreateDialog(false)}
+                  >
                     Annuler
                   </Button>
-                  <Button onClick={handleCreateUser}>Créer l'utilisateur</Button>
+                  <Button onClick={handleCreateUser}>
+                    Créer l'utilisateur
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -257,7 +318,9 @@ export default function AdminUsersPage() {
           <Card>
             <CardHeader>
               <CardTitle>Liste des utilisateurs</CardTitle>
-              <CardDescription>Gérez tous les utilisateurs de la plateforme</CardDescription>
+              <CardDescription>
+                Gérez tous les utilisateurs de la plateforme
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -277,12 +340,15 @@ export default function AdminUsersPage() {
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
-                      <TableCell>{user.role === "teacher" ? user.level : user.class}</TableCell>
+                      <TableCell>
+                        {user.role === "teacher" ? user.level : user.class}
+                      </TableCell>
                       <TableCell>
                         {user.role === "teacher" ? (
                           <div className="text-sm">
                             <p>
-                              <strong>Matières:</strong> {user.subjects?.join(", ")}
+                              <strong>Matières:</strong>{" "}
+                              {user.subjects?.join(", ")}
                             </p>
                             <p>
                               <strong>Paiement:</strong> {user.paymentMethod}
@@ -294,13 +360,21 @@ export default function AdminUsersPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => sendCredentials(user.id)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => sendCredentials(user.id)}
+                          >
                             <Mail className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="sm">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -326,11 +400,15 @@ export default function AdminUsersPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm">Enseignants</span>
-                    <span className="font-medium">{users.filter((u) => u.role === "teacher").length}</span>
+                    <span className="font-medium">
+                      {users.filter((u) => u.role === "teacher").length}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm">Apprenants</span>
-                    <span className="font-medium">{users.filter((u) => u.role === "student").length}</span>
+                    <span className="font-medium">
+                      {users.filter((u) => u.role === "student").length}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -338,7 +416,9 @@ export default function AdminUsersPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Répartition par niveau</CardTitle>
+                <CardTitle className="text-lg">
+                  Répartition par niveau
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -363,13 +443,25 @@ export default function AdminUsersPage() {
                 <CardTitle className="text-lg">Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" size="sm">
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  size="sm"
+                >
                   Envoyer identifiants en masse
                 </Button>
-                <Button className="w-full justify-start" variant="outline" size="sm">
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  size="sm"
+                >
                   Exporter la liste
                 </Button>
-                <Button className="w-full justify-start" variant="outline" size="sm">
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  size="sm"
+                >
                   Import depuis Excel
                 </Button>
               </CardContent>
@@ -378,5 +470,5 @@ export default function AdminUsersPage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

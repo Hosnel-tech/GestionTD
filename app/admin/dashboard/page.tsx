@@ -360,7 +360,7 @@ export default function AdminDashboard() {
                     Derniers enseignants ajoutés à la plateforme
                   </CardDescription>
                 </div>
-                <Link href="/admin/teachers">
+                <Link href="/admin/personnels">
                   <Button variant="outline" size="sm">
                     Voir plus
                     <ArrowRight className="h-4 w-4 ml-2" />

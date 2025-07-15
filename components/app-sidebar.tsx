@@ -41,7 +41,11 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
         return [
           { title: "Dashboard", url: "/admin/dashboard", icon: Home },
           { title: "Gestion TD", url: "/admin/td", icon: BookOpen },
-          { title: "Enseignants", url: "/admin/teachers", icon: GraduationCap },
+          {
+            title: "Personnels",
+            url: "/admin/personnels",
+            icon: GraduationCap,
+          },
           { title: "Apprenants", url: "/admin/students", icon: UserRound },
           { title: "Finances", url: "/admin/finances", icon: DollarSign },
           { title: "Paramètres", url: "/admin/settings", icon: Settings },

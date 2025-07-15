@@ -1,32 +1,44 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BookOpen, GraduationCap, Users } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BookOpen, GraduationCap, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
     role: "",
-  })
-  const router = useRouter()
+  });
+  const router = useRouter();
 
   const handleLogin = () => {
     // Simulation de connexion
     if (credentials.role === "admin") {
-      router.push("/admin/dashboard")
+      router.push("/admin/dashboard");
     } else if (credentials.role === "teacher") {
-      router.push("/teacher/dashboard")
+      router.push("/teacher/dashboard");
     } else if (credentials.role === "student") {
-      router.push("/student/dashboard")
+      router.push("/student/dashboard");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -37,14 +49,20 @@ export default function LoginPage() {
               <BookOpen className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">EduTD Manager</h1>
-          <p className="text-gray-600">Plateforme de gestion des travaux dirigés</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            EduTD Manager
+          </h1>
+          <p className="text-gray-600">
+            Plateforme de gestion des travaux dirigés
+          </p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>Connexion</CardTitle>
-            <CardDescription>Connectez-vous à votre espace personnel</CardDescription>
+            <CardDescription>
+              Connectez-vous à votre espace personnel
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -54,7 +72,9 @@ export default function LoginPage() {
                 type="email"
                 placeholder="votre.email@exemple.com"
                 value={credentials.email}
-                onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+                onChange={(e) =>
+                  setCredentials({ ...credentials, email: e.target.value })
+                }
               />
             </div>
 
@@ -65,7 +85,9 @@ export default function LoginPage() {
                 type="password"
                 placeholder="••••••••"
                 value={credentials.password}
-                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                onChange={(e) =>
+                  setCredentials({ ...credentials, password: e.target.value })
+                }
               />
             </div>
 
@@ -73,7 +95,9 @@ export default function LoginPage() {
               <Label htmlFor="role">Type de compte</Label>
               <Select
                 value={credentials.role}
-                onValueChange={(value) => setCredentials({ ...credentials, role: value })}
+                onValueChange={(value) =>
+                  setCredentials({ ...credentials, role: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez votre rôle" />
@@ -104,7 +128,9 @@ export default function LoginPage() {
             <Button
               onClick={handleLogin}
               className="w-full"
-              disabled={!credentials.email || !credentials.password || !credentials.role}
+              disabled={
+                !credentials.email || !credentials.password || !credentials.role
+              }
             >
               Se connecter
             </Button>
@@ -127,5 +153,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
