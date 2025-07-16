@@ -316,6 +316,23 @@ export default function AdminFinancesPage() {
         </header>
 
         <div className="flex-1 space-y-6 p-6">
+          {/* Boutons état de paiement et état de virement */}
+          <div className="flex gap-4 mb-2">
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-6 py-3 text-base font-semibold flex items-center gap-2 shadow"
+              type="button"
+            >
+              <DollarSign className="h-5 w-5" />
+              État de paiement
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-3 text-base font-semibold flex items-center gap-2 shadow"
+              type="button"
+            >
+              <Banknote className="h-5 w-5" />
+              État de virement
+            </Button>
+          </div>
           {/* Filtres et Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div className="flex gap-4">
@@ -370,22 +387,10 @@ export default function AdminFinancesPage() {
                 </Select>
               )}
             </div>
-
-            {selectedBank && (
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => exportData("excel")}>
-                  <FileSpreadsheet className="h-4 w-4 mr-2" />
-                  Export Excel
-                </Button>
-                <Button variant="outline" onClick={() => exportData("txt")}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Export TXT
-                </Button>
-              </div>
-            )}
           </div>
 
           {/* Statistiques par banque */}
+          {/*
           {selectedBank && (
             <div className="grid gap-4 md:grid-cols-4">
               <Card>
@@ -400,67 +405,61 @@ export default function AdminFinancesPage() {
                     {bankStats.total.toLocaleString()} FCFA
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {bankStats.teachersCount} enseignants
+                    Montant total à payer
                   </p>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Déjà payé
+                    Payé
                   </CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <DollarSign className="h-4 w-4 text-green-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold">
                     {bankStats.paid.toLocaleString()} FCFA
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {/* Correction : éviter NaN si total = 0 */}
-                    {bankStats.total > 0
-                      ? Math.round((bankStats.paid / bankStats.total) * 100)
-                      : 0}
-                    % du total
+                    Montant déjà payé
                   </p>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     En attente
                   </CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <DollarSign className="h-4 w-4 text-orange-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-orange-600">
+                  <div className="text-2xl font-bold">
                     {bankStats.pending.toLocaleString()} FCFA
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {/* Correction : éviter NaN si total = 0 */}
-                    {bankStats.total > 0
-                      ? Math.round((bankStats.pending / bankStats.total) * 100)
-                      : 0}
-                    % du total
+                    Montant en attente de paiement
                   </p>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Écoles</CardTitle>
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">
+                    Nombre de bénéficiaires
+                  </CardTitle>
+                  <DollarSign className="h-4 w-4 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{schools.length}</div>
+                  <div className="text-2xl font-bold">
+                    {bankStats.teachersCount}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    dans cette banque
+                    Enseignants concernés
                   </p>
                 </CardContent>
               </Card>
             </div>
           )}
+*/}
 
           {/* Tableau Secondaire */}
           {selectedBank &&
