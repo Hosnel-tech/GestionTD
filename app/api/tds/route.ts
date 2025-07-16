@@ -1,107 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  MOCK_TDS,
-  MOCK_COURSES,
-  MOCK_TEACHERS,
-  MOCK_SUBMISSIONS,
-} from "@/lib/mock-data";
+import { pool } from "@/lib/db";
+import { v4 as uuidv4 } from "uuid";
 
 export async function GET(request: NextRequest) {
   try {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    const url = new URL(request.url);
+    const course = url.searchParams.get("subject");
+    const teacher = url.searchParams.get("teacherId");
+    const status = url.searchParams.get("status");
 
-    const searchParams = request.nextUrl.searchParams;
-    const course_filter = searchParams.get("courseId");
-    const teacher_filter = searchParams.get("teacherId");
-    const status_filter = searchParams.get("status");
+    let query = "SELECT * FROM tds WHERE 1=1";
+    const params: any[] = [];
 
-    let tds = MOCK_TDS;
-
-    // Apply filters
-    if (course_filter) {
-      tds = tds.filter((td) => td.courseId === course_filter);
-    }
-    if (teacher_filter) {
-      tds = tds.filter((td) => td.teacherId === teacher_filter);
-    }
-    if (status_filter) {
-      tds = tds.filter((td) => td.status === status_filter);
+    if (course) {
+      query += " AND subject = ?";
+      params.push(course);
     }
 
-    // Add course and teacher info for each TD
-    const tdsWithDetails = tds.map((td) => {
-      const course = MOCK_COURSES.find((c) => c.id === td.courseId);
-      const teacher = MOCK_TEACHERS.find((t) => t.id === td.teacherId);
-      const submissions = MOCK_SUBMISSIONS.filter((s) => s.tdId === td.id);
+    if (teacher) {
+      query += " AND teacher_id = ?";
+      params.push(teacher);
+    }
 
-      return {
-        ...td,
-        course: course
-          ? {
-              id: course.id,
-              name: course.name,
-              code: course.code,
-              level: course.level,
-            }
-          : null,
-        teacher: teacher
-          ? {
-              id: teacher.id,
-              name: `${teacher.firstName} ${teacher.lastName}`,
-              email: teacher.email,
-            }
-          : null,
-        statistics: {
-          totalSubmissions: submissions.length,
-          gradedSubmissions: submissions.filter((s) => s.status === "graded")
-            .length,
-          averageScore:
-            submissions.length > 0
-              ? submissions
-                  .filter((s) => s.score !== undefined)
-                  .reduce((sum, s) => sum + (s.score || 0), 0) /
-                submissions.filter((s) => s.score !== undefined).length
-              : 0,
-        },
-      };
-    });
+    if (status) {
+      query += " AND status = ?";
+      params.push(status);
+    }
 
-    return NextResponse.json({
-      tds: tdsWithDetails,
-      total: tdsWithDetails.length,
-    });
-  } catch (error) {
+    query += " ORDER BY date DESC";
+
+    const [rows] = await pool.query(query, params);
+
+    return NextResponse.json({ tds: rows, total: rows.length });
+  } catch (err) {
+    console.error("GET /tds error:", err);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des TDs" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const newTD = await request.json();
+    const body = await request.json();
+    console.log('Body: ', body);
 
-    // Simulate creating a new TD
-    const td = {
-      id: `td${Date.now()}`,
-      ...newTD,
-      createdAt: new Date().toISOString(),
-      submissions: [],
-    };
+    const {
+      subject,
+      class: tdClass,
+      teacher,
+      date,
+      duration,
+    } = body;
 
-    // In a real app, this would be saved to a database
-    MOCK_TDS.push(td);
+    const id = `td_${uuidv4()}`;
+    const createdAt = new Date();
+
+    await pool.query(
+      `INSERT INTO tds (id, subject, class, teacher, date, duration, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id, subject, tdClass, teacher, date, duration, createdAt]
+    );
 
     return NextResponse.json(
-      { td, message: "TD créé avec succès" },
-      { status: 201 },
+      { message: "TD créé avec succès", id },
+      { status: 201 }
     );
-  } catch (error) {
+  } catch (err) {
+    console.error("POST /tds error:", err);
     return NextResponse.json(
       { error: "Erreur lors de la création du TD" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

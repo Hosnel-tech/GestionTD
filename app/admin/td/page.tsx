@@ -1,6 +1,6 @@
 "use client";
-
-import { useState } from "react";
+import * as XLSX from "xlsx";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -58,41 +58,21 @@ export default function AdminTDPage() {
     examFile: null,
   });
 
-  const tdList = [
-    {
-      id: 1,
-      subject: "Mathématiques",
-      class: "3ème",
-      teacher: "M. Kouassi Jean",
-      date: "2024-01-20",
-      time: "14:00",
-      duration: "2h",
-      status: "en_attente",
-      students: 25,
-    },
-    {
-      id: 2,
-      subject: "Français",
-      class: "Tle",
-      teacher: "Mme Diabaté Marie",
-      date: "2024-01-21",
-      time: "10:00",
-      duration: "3h",
-      status: "confirme",
-      students: 30,
-    },
-    {
-      id: 3,
-      subject: "Sciences",
-      class: "CM2",
-      teacher: "M. Traoré Paul",
-      date: "2024-01-22",
-      time: "15:00",
-      duration: "1h30",
-      status: "termine",
-      students: 20,
-    },
-  ];
+  const [tdList, setTDList] = useState<any[]>([]);
+
+  useEffect(() => {
+  const fetchTDs = async () => {
+    try {
+      const res = await fetch("/api/tds");
+      const data = await res.json();
+      setTDList(data.tds || []);
+    } catch (err) {
+      console.error("Erreur lors de la récupération des TDs", err);
+    }
+  };
+  fetchTDs();
+}, []);
+
 
   const teachers = [
     {
@@ -142,8 +122,33 @@ export default function AdminTDPage() {
     }
   };
 
-  const handleCreateTD = () => {
-    console.log("Création TD:", newTD);
+  const handleCreateTD = async () => {
+  try {
+    const payload = {
+      subject: newTD.subject,
+      class: newTD.class,
+      teacher: newTD.teacher,
+      date: newTD.date,
+      duration: newTD.duration,
+    };
+
+    const res = await fetch("/api/tds", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Erreur création");
+
+    const data = await res.json();
+    console.log("TD créé:", data);
+
+    // refresh list
+    setTDList((prev) => [
+      ...prev,
+      { ...payload, id: data.id, status: "en_attente", students: 0 },
+    ]);
+
     setShowCreateDialog(false);
     setNewTD({
       subject: "",
@@ -155,13 +160,58 @@ export default function AdminTDPage() {
       description: "",
       examFile: null,
     });
-  };
+  } catch (err) {
+    console.error("Erreur lors de la création du TD", err);
+  }
+};
+
 
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [selectedTD, setSelectedTD] = useState<any>(null);
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editTD, setEditTD] = useState<any>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const arrayBuffer = event.target?.result;
+    if (!arrayBuffer) return;
+
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+    // Combine rows from all sheets
+    const allRows: any[] = [];
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet);
+      allRows.push(...rows);
+    });
+
+    console.log("All combined rows from all sheets:", allRows);
+
+    try {
+      const res = await fetch("/api/tds/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Échec import.");
+
+      alert(result.message);
+    } catch (err: any) {
+      console.error("Import failed:", err);
+      alert("Erreur: " + err.message);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+};
 
   const handleEditTD = () => {
     console.log("Modification TD:", editTD);
@@ -190,7 +240,12 @@ export default function AdminTDPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Rechercher un TD..." className="pl-10 w-64" />
             </div>
-
+        <input type="file" accept=".xlsx, .xls" onChange={handleFileChange}  className="hidden" id="excel-upload"/>
+          <Button asChild variant="default">
+          <label htmlFor="excel-upload" className="cursor-pointer">
+          Importer un fichier Excel
+          </label>
+          </Button>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
                 <Button>
@@ -253,7 +308,7 @@ export default function AdminTDPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {teachers.map((teacher) => (
-                          <SelectItem key={teacher.id} value={teacher.name}>
+                          <SelectItem key={teacher.id} value={String(teacher.name)}>
                             {teacher.name} - {teacher.level}
                           </SelectItem>
                         ))}
@@ -270,17 +325,6 @@ export default function AdminTDPage() {
                         value={newTD.date}
                         onChange={(e) =>
                           setNewTD({ ...newTD, date: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="time">Heure</Label>
-                      <Input
-                        id="time"
-                        type="time"
-                        value={newTD.time}
-                        onChange={(e) =>
-                          setNewTD({ ...newTD, time: e.target.value })
                         }
                       />
                     </div>
@@ -365,10 +409,10 @@ export default function AdminTDPage() {
                         </div>
                         <div className="text-sm">
                           <p>
-                            {td.date} à {td.time}
+                            {new Date(td.date).toLocaleDateString("fr-FR")}
                           </p>
                           <p className="text-muted-foreground">
-                            {td.duration} • {td.students} élèves
+                            {td.duration}h
                           </p>
                         </div>
                       </div>

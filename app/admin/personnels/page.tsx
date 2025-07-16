@@ -1,6 +1,7 @@
 "use client";
-
-import { useState } from "react";
+import { ExcelRow } from "@/types/personnel";
+import * as XLSX from "xlsx";
+import { useState, useEffect } from "react";
 import { useRef } from "react";
 import {
   Card,
@@ -53,6 +54,7 @@ import {
 } from "lucide-react";
 
 export default function AdminTeachersPage() {
+  const [personnels, setPersonnels] = useState<any[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newPersonnel, setNewPersonnel] = useState({
     type: "",
@@ -75,185 +77,25 @@ export default function AdminTeachersPage() {
   const [importError, setImportError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const teachers = [
-    {
-      id: 1,
-      name: "M. Kouassi Jean",
-      email: "kouassi@edutd.com",
-      phone: "+225 07 12 34 56",
-      school: "Collège Moderne de Cocody",
-      class: "3ème, Tle",
-      level: "secondaire",
-      subjects: "Mathématiques",
-      paymentMethod: "banque",
-      status: "active",
-      ifu: "IFU123456",
-      accountNumber: "1234567890",
-      type: "Enseignant",
-      bank: "Banque Atlantique",
-    },
-    {
-      id: 2,
-      name: "Mme Diabaté Marie",
-      email: "diabate@edutd.com",
-      phone: "+225 05 67 89 01",
-      school: "Lycée Technique d'Abidjan",
-      class: "3ème",
-      level: "secondaire",
-      subjects: "Français",
-      paymentMethod: "electronique",
-      status: "active",
-      ifu: "IFU654321",
-      accountNumber: "0987654321",
-      type: "Enseignant",
-      bank: "SGBCI",
-    },
-    {
-      id: 3,
-      name: "M. Traoré Paul",
-      email: "traore@edutd.com",
-      phone: "+225 01 23 45 67",
-      school: "École Primaire Les Palmiers",
-      class: "CM2",
-      level: "primaire",
-      subjects: "Sciences",
-      paymentMethod: "banque",
-      status: "active",
-      ifu: "IFU112233",
-      accountNumber: "1122334455",
-      type: "Enseignant",
-      bank: "Ecobank",
-    },
-    {
-      id: 4,
-      name: "Mme Koné Fatou",
-      email: "kone@edutd.com",
-      phone: "+225 07 89 01 23",
-      school: "Collège Sainte-Marie",
-      class: "Tle",
-      level: "secondaire",
-      subjects: "Histoire",
-      paymentMethod: "electronique",
-      status: "inactive",
-      ifu: "IFU998877",
-      accountNumber: "9988776655",
-      type: "Enseignant",
-      bank: "Banque Atlantique",
-    },
-    // Conseiller pédagogique
-    {
-      id: 5,
-      name: "M. Yao Bernard",
-      email: "yao.bernard@edutd.com",
-      phone: "+225 09 11 22 33",
-      school: "Groupe Scolaire Excellence",
-      paymentMethod: "banque",
-      status: "active",
-      ifu: "IFU445566",
-      accountNumber: "4455667788",
-      type: "Conseiller pédagogique",
-      bank: "SGBCI",
-    },
-    {
-      id: 6,
-      name: "Mme Akissi Florence",
-      email: "akissi.florence@edutd.com",
-      phone: "+225 08 22 33 44",
-      school: "Collège Moderne de Cocody",
-      paymentMethod: "electronique",
-      status: "active",
-      ifu: "IFU556677",
-      accountNumber: "5566778899",
-      type: "Conseiller pédagogique",
-      bank: "Ecobank",
-    },
-    // Surveillant général
-    {
-      id: 7,
-      name: "M. Koffi Serge",
-      email: "koffi.serge@edutd.com",
-      phone: "+225 06 33 44 55",
-      school: "Lycée Technique d'Abidjan",
-      paymentMethod: "banque",
-      status: "active",
-      ifu: "IFU667788",
-      accountNumber: "6677889900",
-      type: "Surveillant général",
-      bank: "Banque Atlantique",
-    },
-    {
-      id: 8,
-      name: "Mme N'Dri Awa",
-      email: "ndri.awa@edutd.com",
-      phone: "+225 05 44 55 66",
-      school: "Collège Sainte-Marie",
-      paymentMethod: "electronique",
-      status: "inactive",
-      ifu: "IFU778899",
-      accountNumber: "7788990011",
-      type: "Surveillant général",
-      bank: "SGBCI",
-    },
-    // Censeur
-    {
-      id: 9,
-      name: "M. Kouamé Michel",
-      email: "kouame.michel@edutd.com",
-      phone: "+225 04 55 66 77",
-      school: "École Primaire Les Palmiers",
-      paymentMethod: "banque",
-      status: "active",
-      ifu: "IFU889900",
-      accountNumber: "8899001122",
-      type: "Censeur",
-      bank: "Ecobank",
-    },
-    {
-      id: 10,
-      name: "Mme Tano Elise",
-      email: "tano.elise@edutd.com",
-      phone: "+225 03 66 77 88",
-      school: "Groupe Scolaire Excellence",
-      paymentMethod: "electronique",
-      status: "active",
-      ifu: "IFU990011",
-      accountNumber: "9900112233",
-      type: "Censeur",
-      bank: "Banque Atlantique",
-    },
-    // Directeur
-    {
-      id: 11,
-      name: "M. Ouattara Idriss",
-      email: "ouattara.idriss@edutd.com",
-      phone: "+225 02 77 88 99",
-      school: "Collège Moderne de Cocody",
-      paymentMethod: "banque",
-      status: "active",
-      ifu: "IFU001122",
-      accountNumber: "0011223344",
-      type: "Directeur",
-      bank: "SGBCI",
-    },
-    {
-      id: 12,
-      name: "Mme Soro Aminata",
-      email: "soro.aminata@edutd.com",
-      phone: "+225 01 88 99 00",
-      school: "Lycée Technique d'Abidjan",
-      paymentMethod: "electronique",
-      status: "inactive",
-      ifu: "IFU112233",
-      accountNumber: "1122334455",
-      type: "Directeur",
-      bank: "Ecobank",
-    },
-  ];
-
   // Pour la démo, on suppose que tous les éléments de 'teachers' sont des 'Enseignant'.
   // Pour un vrai usage, il faudrait un champ 'type' dans chaque objet.
   // On adapte la démo pour permettre le filtre.
-  const personnels = teachers;
+  //const personnels = teachers;
+
+  useEffect(() => {
+  const fetchPersonnels = async () => {
+    try {
+      const res = await fetch("/api/personnel");
+      const data = await res.json();
+      setPersonnels(data.personnel);
+    } catch (error) {
+      console.error("Erreur lors du chargement du personnel", error);
+    }
+  };
+
+  fetchPersonnels();
+}, []);
+
 
   const filteredPersonnels = selectedType
     ? personnels.filter((p) => p.type === selectedType)
@@ -297,15 +139,42 @@ export default function AdminTeachersPage() {
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
-  };
+  }
 
-  const handleCreatePersonnel = () => {
-    console.log("Création personnel:", newPersonnel);
+
+  const handleCreatePersonnel = async () => {
+  try {
+    const res = await fetch("/api/personnel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: newPersonnel.type,
+        name: newPersonnel.name,
+        phone: newPersonnel.phone,
+        school: newPersonnel.school,
+        class: newPersonnel.class,
+        subjects: newPersonnel.subjects,
+        ifu: newPersonnel.ifu,
+        accountNumber: newPersonnel.accountNumber,
+        level: newPersonnel.level,
+        bank: newPersonnel.bank,
+      }),
+    });
+
+    if (!res.ok) throw new Error("Erreur création");
+
+    const data = await res.json();
+    console.log("Personnel créé:", data);
+
+    // Optional: refresh list
+    setPersonnels((prev) => [...prev, { id: data.id, ...newPersonnel }]);
+
+    // Close modal & reset form
     setShowCreateDialog(false);
     setNewPersonnel({
       type: "",
       name: "",
-      email: "",
+      email:"",
       phone: "",
       school: "",
       class: "",
@@ -315,7 +184,70 @@ export default function AdminTeachersPage() {
       level: "",
       bank: "",
     });
+  } catch (err) {
+    console.error("Erreur lors de la création du personnel", err);
+  }
+};
+
+const handleUpload = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await fetch("/api/personnel/import", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || "Erreur lors de l'importation");
+    }
+
+    const result = await res.json();
+    alert(`Importation réussie\nAjoutés: ${result.inserted}\nIgnorés (doublons): ${result.skipped}`);
+    setImportFile(null);
+  } catch (err: any) {
+    setImportError(err.message);
+  }
+};
+
+const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target?.result as ArrayBuffer);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    // Combine all rows from all sheets
+    const allRows: any[] = [];
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+      allRows.push(...json);
+    });
+
+    console.log("All combined rows from all sheets:", allRows);
+
+    // Send JSON directly
+    try {
+      const res = await fetch("/api/personnel/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      console.log("Importation réussie:", result);
+    } catch (err) {
+      console.error("Erreur réseau:", err);
+    }
   };
+
+  reader.readAsArrayBuffer(file);
+};
 
   const handleEditTeacher = () => {
     console.log("Modification enseignant:", editTeacher);
@@ -367,36 +299,12 @@ export default function AdminTeachersPage() {
               </Select>
               <input
                 type="file"
-                accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                style={{ display: "none" }}
+                accept=".csv, .xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 ref={fileInputRef}
-                onChange={(e) => {
-                  setImportError("");
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const allowedTypes = [
-                      "text/csv",
-                      "application/vnd.ms-excel",
-                      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    ];
-                    const allowedExtensions = [".csv", ".xls", ".xlsx"];
-                    const ext = file.name
-                      .slice(file.name.lastIndexOf("."))
-                      .toLowerCase();
-                    if (
-                      allowedTypes.includes(file.type) ||
-                      allowedExtensions.includes(ext)
-                    ) {
-                      setImportFile(file);
-                    } else {
-                      setImportFile(null);
-                      setImportError(
-                        "Seuls les fichiers CSV ou Excel sont acceptés."
-                      );
-                    }
-                  }
-                }}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
               />
+
               <Button
                 type="button"
                 variant="outline"
@@ -404,6 +312,7 @@ export default function AdminTeachersPage() {
               >
                 Importer CSV/Excel
               </Button>
+              <input type="file" accept=".xlsx,.xls,.csv" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }}/>
               {importFile && (
                 <span className="text-xs text-muted-foreground">
                   Fichier sélectionné : {importFile.name}
