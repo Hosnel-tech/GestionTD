@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
         [ifu]
       );
       if ((existing as any[]).length > 0) {
-        console.log("↩️ Already exists:", ifu);
+        //console.log("↩️ Already exists:", ifu);
         continue;
       }
 

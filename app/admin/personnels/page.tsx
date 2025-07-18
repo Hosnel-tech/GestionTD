@@ -240,7 +240,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       });
 
       const result = await res.json();
-      console.log("Importation réussie:", result);
+      alert("Importation réussie: " + result.message);
     } catch (err) {
       console.error("Erreur réseau:", err);
     }
