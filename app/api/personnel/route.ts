@@ -2,11 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 
+function toCamelCase(str: string) {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+function keysToCamelCase(row: Record<string, any>) {
+  const result: Record<string, any> = {};
+  for (const key in row) {
+    result[toCamelCase(key)] = row[key];
+  }
+  return result;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const [rows] = await pool.query("SELECT * FROM personnel");
-    console.log("Rows: ", rows);
-    return NextResponse.json({ personnel: rows });
+
+    const personnels = (rows as any[]).map(keysToCamelCase);
+
+    return NextResponse.json({ personnel: personnels });
   } catch (err) {
     console.error("GET /personnel error:", err);
     return NextResponse.json(

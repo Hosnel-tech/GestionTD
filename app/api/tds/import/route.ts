@@ -8,6 +8,7 @@ type TDRow = {
   "Date séance"?: string | number | Date;
   "Nombre d'heure 3ème"?: string | number;
   "Nombre d'heure Tle"?: string | number;
+  "Centre"?: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -67,11 +68,12 @@ export async function POST(req: NextRequest) {
 
       const id = `td_${uuidv4()}`;
       const createdAt = new Date();
+      const school = String(row["Centre"]);
 
       await pool.query(
-        `INSERT INTO tds (id, teacher, subject, class, duration, date, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [id, name, subject, tdClass, duration, date, createdAt]
+        `INSERT INTO tds (id, teacher, subject, class, duration, date, created_at, school)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, name, subject, tdClass, duration, date, createdAt, school]
       );
 
       inserted++;
