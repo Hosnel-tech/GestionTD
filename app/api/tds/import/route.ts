@@ -11,30 +11,65 @@ type TDRow = {
   "Centre"?: string;
 };
 
+// Subject normalization map (exact matches only, all lowercase)
+const subjectMap: { [key: string]: string } = {
+  maths: "Maths",
+  math: "Maths",
+  "mathématiques": "Maths",
+  "mathématique": "Maths",
+  "français": "Français",
+  philo: "Philosophie",
+  philosophie: "Philosophie",
+  svt: "SVT",
+  pct: "PCT",
+  anglais: "Anglais",
+  economie: "Economie",
+  économie: "Economie",
+  allemand: "Allemand",
+  "histoire-géo": "Histoire-Géo",
+  "histoire": "Histoire-Géo",
+};
+
+function normalizeSubject(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const cleaned = raw.trim().toLowerCase();
+
+  if (subjectMap[cleaned]) return subjectMap[cleaned];
+
+  if (cleaned.startsWith("espa")) return "Espagnol";
+  if (cleaned.startsWith("allem")) return "Allemand";
+  if (cleaned.startsWith("math")) return "Maths";
+  if (cleaned.startsWith("eco")) return "Economie";
+  if (cleaned.startsWith("hist")) return "Histoire-Géo";
+  if (cleaned.startsWith("h")) return "Histoire-Géo";
+  return raw;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const rows: TDRow[] = await req.json();
     let inserted = 0;
 
+    // Delete existing data
+    await pool.query("DELETE FROM tds");
+
     for (const row of rows) {
       const name = row["Nom et prénoms"]?.trim();
-      const subject = row["Matière"]?.trim();
+      const subject = normalizeSubject(row["Matière"]);
       const rawDate = row["Date séance"];
       let date: Date | null = null;
 
-      // Parse date from Excel or string format
+      // Parse date
       if (Object.prototype.toString.call(rawDate) === "[object Date]") {
         date = rawDate as Date;
       } else if (typeof rawDate === "number") {
-        // Excel serial date format
         date = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
       } else if (typeof rawDate === "string") {
-        // Handle DD/MM/YYYY format
         const parts = rawDate.split("/");
         if (parts.length === 3) {
           const [day, month, year] = parts.map(Number);
           if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-            date = new Date(year, month - 1, day); // JS months = 0-indexed
+            date = new Date(year, month - 1, day);
           }
         } else {
           const parsed = new Date(rawDate);

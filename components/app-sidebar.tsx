@@ -32,6 +32,8 @@ interface AppSidebarProps {
   userRole: "admin" | "teacher" | "student";
 }
 
+const currentYear = `${new Date().getFullYear()}`;
+
 export function AppSidebar({ userRole }: AppSidebarProps) {
   const pathname = usePathname();
 
@@ -105,7 +107,7 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
 
       <SidebarFooter>
         <div className="p-4 text-center text-sm text-muted-foreground">
-          © 2024 EduTD Manager
+          © {currentYear} EduTD Manager
         </div>
       </SidebarFooter>
     </Sidebar>

@@ -2,6 +2,40 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 
+// Subject normalization map
+const subjectMap: { [key: string]: string } = {
+  maths: "Maths",
+  math: "Maths",
+  "mathématiques": "Maths",
+  "mathématique": "Maths",
+  "français": "Français",
+  philo: "Philosophie",
+  philosophie: "Philosophie",
+  svt: "SVT",
+  pct: "PCT",
+  anglais: "Anglais",
+  economie: "Economie",
+  économie: "Economie",
+  allemand: "Allemand",
+  "histoire-géo": "Histoire-Géo",
+  "histoire": "Histoire-Géo",
+};
+
+function normalizeSubject(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const cleaned = raw.trim().toLowerCase();
+
+  if (subjectMap[cleaned]) return subjectMap[cleaned];
+
+  if (cleaned.startsWith("espa")) return "Espagnol";
+  if (cleaned.startsWith("allem")) return "Allemand";
+  if (cleaned.startsWith("math")) return "Maths";
+  if (cleaned.startsWith("eco")) return "Economie";
+  if (cleaned.startsWith("hist")) return "Histoire-Géo";
+  if (cleaned.startsWith("h")) return "Histoire-Géo";
+  return raw;
+}
+
 type ExcelRow = {
   "Nom et prénoms"?: string | number | null;
   Qualité?: string | number | null;
@@ -15,61 +49,37 @@ type ExcelRow = {
 export async function POST(req: NextRequest) {
   try {
     const rows: ExcelRow[] = await req.json();
-
     let inserted = 0;
 
+    const seenIfus = new Set<string>();
+
+    await pool.query("DELETE FROM personnel");
+
     for (const row of rows) {
-      const name =
-        typeof row["Nom et prénoms"] === "string"
-          ? row["Nom et prénoms"].trim()
-          : String(row["Nom et prénoms"] ?? "").trim();
-
+      const name = String(row["Nom et prénoms"] ?? "").trim();
       const typeRaw = row["Qualité"];
-      const type =
-        typeof typeRaw === "string"
-          ? typeRaw.trim()
-          : String(typeRaw ?? "Inconnu").trim();
-
-      const ifuRaw = row["N° IFU"];
-      const ifu =
-        typeof ifuRaw === "string"
-          ? ifuRaw.trim()
-          : String(ifuRaw ?? "").trim();
-
-      const accountNumber =
-        typeof row["N° de Compte"] === "string"
-          ? row["N° de Compte"].trim()
-          : String(row["N° de Compte"] ?? "").trim();
-
-      const bank =
-        typeof row["Banques"] === "string"
-          ? row["Banques"].trim()
-          : String(row["Banques"] ?? "").trim();
-
-      const school =
-        typeof row["Centre"] === "string"
-          ? row["Centre"].trim()
-          : String(row["Centre"] ?? "").trim();
-
-      const subjects =
-        type.toLowerCase() === "enseignant"
-          ? typeof row["Matière"] === "string"
-            ? row["Matière"].trim()
-            : String(row["Matière"] ?? "").trim()
-          : "UNDEFINED";
+      const type = String(typeRaw ?? "Inconnu").trim();
+      const ifu = String(row["N° IFU"] ?? "").trim();
 
       if (!name || !ifu || !type) {
         console.log("⚠️ Skipped row (missing name/type/ifu):", row);
         continue;
       }
 
-      const [existing] = await pool.query(
-        "SELECT id FROM personnel WHERE ifu = ?",
-        [ifu]
-      );
-      if ((existing as any[]).length > 0) {
-        //console.log("↩️ Already exists:", ifu);
+      if (seenIfus.has(ifu)) {
+        console.log("↩️ Skipped duplicate IFU:", ifu);
         continue;
+      }
+      seenIfus.add(ifu);
+
+      const accountNumber = String(row["N° de Compte"] ?? "").trim();
+      const bank = String(row["Banques"] ?? "").trim();
+      const school = String(row["Centre"] ?? "").trim();
+
+      let subjects = "UNDEFINED";
+      if (type.toLowerCase() === "enseignant") {
+        const rawSubject = String(row["Matière"] ?? "").trim();
+        subjects = normalizeSubject(rawSubject) ?? rawSubject;
       }
 
       const id = `pers_${uuidv4()}`;
