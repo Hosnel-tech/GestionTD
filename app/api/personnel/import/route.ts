@@ -50,9 +50,10 @@ export async function POST(req: NextRequest) {
   try {
     const rows: ExcelRow[] = await req.json();
     let inserted = 0;
+    let updated = 0;
+    const now = new Date();
 
-    const seenIfus = new Set<string>();
-
+    // Clear table if necessary
     await pool.query("DELETE FROM personnel");
 
     for (const row of rows) {
@@ -61,16 +62,7 @@ export async function POST(req: NextRequest) {
       const type = String(typeRaw ?? "Inconnu").trim();
       const ifu = String(row["N° IFU"] ?? "").trim();
 
-      if (!name || !ifu || !type) {
-        console.log("⚠️ Skipped row (missing name/type/ifu):", row);
-        continue;
-      }
-
-      if (seenIfus.has(ifu)) {
-        console.log("↩️ Skipped duplicate IFU:", ifu);
-        continue;
-      }
-      seenIfus.add(ifu);
+      if (!name || !type || !ifu) continue;
 
       const accountNumber = String(row["N° de Compte"] ?? "").trim();
       const bank = String(row["Banques"] ?? "").trim();
@@ -82,20 +74,59 @@ export async function POST(req: NextRequest) {
         subjects = normalizeSubject(rawSubject) ?? rawSubject;
       }
 
-      const id = `pers_${uuidv4()}`;
-      const createdAt = new Date();
+      // Check existing IFU
+      const [rowsExist] = await pool.query(
+        `SELECT bank, account_number FROM personnel WHERE ifu = ?`,
+        [ifu]
+      );
 
+      if (Array.isArray(rowsExist) && rowsExist.length > 0) {
+        const existing = rowsExist[0] as any;
+        const existingBanks = existing.bank ? String(existing.bank).split(",").map(b => b.trim()) : [];
+        const existingAccounts = existing.account_number
+          ? String(existing.account_number).split(",").map(a => a.trim())
+          : [];
+
+        let updatedBanks = [...existingBanks];
+        let updatedAccounts = [...existingAccounts];
+        let needsUpdate = false;
+
+        if (!existingBanks.includes(bank)) {
+          // New bank → add bank + account
+          updatedBanks.push(bank);
+          updatedAccounts.push(accountNumber);
+          needsUpdate = true;
+        } else if (!existingAccounts.includes(accountNumber)) {
+          // Same bank, new account → add account only
+          updatedAccounts.push(accountNumber);
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+          await pool.query(
+            `UPDATE personnel SET bank = ?, account_number = ? WHERE ifu = ?`,
+            [updatedBanks.join(", "), updatedAccounts.join(", "), ifu]
+          );
+          updated++;
+        }
+
+        continue; // skip insert
+      }
+
+      // Insert new record
+      const id = `pers_${uuidv4()}`;
       await pool.query(
         `INSERT INTO personnel 
          (id, type, name, subjects, ifu, account_number, bank, created_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, type, name, subjects, ifu, accountNumber, bank, createdAt]
+        [id, type, name, subjects, ifu, accountNumber, bank, now]
       );
-
       inserted++;
     }
 
-    return NextResponse.json({ message: `${inserted} personnels importés.` });
+    return NextResponse.json({
+      message: `${inserted} personnels importés, ${updated} mises à jour.`,
+    });
   } catch (err) {
     console.error("❌ Erreur import:", err);
     return NextResponse.json(

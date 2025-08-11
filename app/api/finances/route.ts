@@ -23,23 +23,33 @@ export async function GET(req: NextRequest) {
     const teacherMap = new Map();
     const allDatesSet = new Set<string>();
 
-    const ensureSchool = (bank: string, school: string) => {
-      if (!bankData[bank]) bankData[bank] = { schools: {} };
-      if (!bankData[bank].schools[school]) {
-        bankData[bank].schools[school] = {
+    const ensureSecondarySchool = (bank: string, school: string) => {
+      if (!bankData[bank]) bankData[bank] = { secondarySchools: {}, primarySchools: {} };
+      if (!bankData[bank].secondarySchools[school]) {
+        bankData[bank].secondarySchools[school] = {
           secondaryTeachers: [],
         };
       }
     };
 
+    const ensurePrimarySchool = (bank: string, school: string) => {
+      if (!bankData[bank]) bankData[bank] = { secondarySchools: {}, primarySchools: {} };
+      if (!bankData[bank].primarySchools[school]) {
+        bankData[bank].primarySchools[school] = {
+          primaryTeachers: [],
+        };
+      }
+    };
+
+    // secondary teachers
     for (const row of rows as any[]) {
       const dateKey = new Date(row.date).toLocaleDateString("fr-FR");
       const classKey = row.class === "3ème" ? "3ème" : "Tle";
-      const duration = Number(row.duration); // ✅ ensure numeric duration
+      const duration = Number(row.duration);
       const key = `${row.bank}::${row.school}::${row.name}`;
 
       allDatesSet.add(dateKey);
-      ensureSchool(row.bank, row.school);
+      ensureSecondarySchool(row.bank, row.school);
 
       if (!teacherMap.has(key)) {
         teacherMap.set(key, {
@@ -50,36 +60,152 @@ export async function GET(req: NextRequest) {
           },
           rates: { "3ème": 6000, Tle: 7000 },
           amount: { "3ème": 0, Tle: 0, total: 0 },
-          paid: false,
         });
       }
 
       const teacher = teacherMap.get(key);
       teacher.subjectSet.add(row.subject);
 
-      // Initialize date if needed
       if (!teacher.hours[dateKey]) {
         teacher.hours[dateKey] = { "3ème": 0, Tle: 0 };
       }
 
-      // ✅ Safely increment numbers
       teacher.hours[dateKey][classKey] += duration;
       teacher.hours.total[classKey] += duration;
       teacher.amount[classKey] += duration * teacher.rates[classKey];
-
-      // ✅ Final total (safe addition)
       teacher.amount.total =
         Number(teacher.amount["3ème"]) + Number(teacher.amount["Tle"]);
     }
 
-    // Finalize each teacher
     for (const [key, teacher] of teacherMap.entries()) {
       const [bank, school] = key.split("::");
-
       teacher.subject = Array.from(teacher.subjectSet).join(", ");
       delete teacher.subjectSet;
 
-      bankData[bank].schools[school].secondaryTeachers.push(teacher);
+      bankData[bank].secondarySchools[school].secondaryTeachers.push(teacher);
+    }
+
+    // primary teachers
+    const [primaryRows] = await pool.query(
+      `SELECT name, bank, centre AS school, forfait, type FROM primaire`
+    );
+
+    for (const row of primaryRows as any[]) {
+      const bank = row.bank || "INCONNU";
+      const school = row.school || "INCONNU";
+      const type = row.type || "INCONNU";
+      ensurePrimarySchool(bank, school);
+
+      const forfait = Number(row.forfait) || 0;
+
+      bankData[bank].primarySchools[school].primaryTeachers.push({
+        name: row.name,
+        forfait,
+        type,
+      });
+    }
+
+    //supervisors and CPs (primaire)
+
+    const [supcpRows] = await pool.query(
+      `SELECT name, bank, cs AS school, montant, type FROM supcpprim`
+    );
+
+    for (const row of supcpRows as any[]) {
+      const bank = row.bank || "INCONNU";
+      const school = row.school || "INCONNU";
+      const type = row.type || "INCONNU";
+      ensurePrimarySchool(bank, school);
+
+      const montant = Number(row.montant) || 0;
+
+      if (!bankData[bank].primarySchools[school].supervisors) {
+        bankData[bank].primarySchools[school].supervisors = [];
+      }
+
+      bankData[bank].primarySchools[school].supervisors.push({
+        name: row.name,
+        montant,
+        type,
+      });
+    }
+
+    // directeurs, censeurs, surveillants (secondaire)
+    const [dirCensSuvRows] = await pool.query(
+      `SELECT name, type, forfait, bank, school FROM dircenssuv`
+    );
+
+    for (const row of dirCensSuvRows as any[]) {
+      const bank = row.bank || "INCONNU";
+      const school = row.school || "INCONNU";
+      const type = row.type || "INCONNU";
+      ensureSecondarySchool(bank, school);
+
+      if (!bankData[bank].secondarySchools[school].dirCensSuv) {
+        bankData[bank].secondarySchools[school].dirCensSuv = [];
+      }
+
+      bankData[bank].secondarySchools[school].dirCensSuv.push({
+        name: row.name,
+        forfait: Number(row.forfait) || 0,
+        type,
+      });
+    }
+
+    // CPs Secondaire (no school, grouped by bank only)
+    const [cpSecRows] = await pool.query(
+      `SELECT name, type, forfait, bank FROM cpsecondaire`
+    );
+
+    for (const row of cpSecRows as any[]) {
+      const bank = row.bank || "INCONNU";
+      const type = row.type || "INCONNU";
+      const forfait = Number(row.forfait) || 0;
+
+      if (!bankData[bank]) {
+        bankData[bank] = { secondarySchools: {}, primarySchools: {} };
+      }
+
+      if (!bankData[bank].secondaryCp) {
+        bankData[bank].secondaryCp = [];
+      }
+
+      bankData[bank].secondaryCp.push({
+        name: row.name,
+        type,
+        forfait,
+      });
+    }
+
+    // Membres de la Coordination (no school, grouped by bank only)
+    const [mcoordRows] = await pool.query(
+      `SELECT name, type, montant, bank, indice, n_days, daily_p FROM mcoord`
+    );
+
+    for (const row of mcoordRows as any[]) {
+      const bank = row.bank || "INCONNU";
+      const type = row.type || "INCONNU";
+      const montant = Number(row.montant) || 0;
+      const indice = row.indice || 0;
+      const n_days = row.n_days  || 0;
+      const daily_p = row.daily_p || 0;
+
+      if (!bankData[bank]) {
+        bankData[bank] = { secondarySchools: {}, primarySchools: {} };
+      }
+
+      if (!bankData[bank].mcoord) {
+        bankData[bank].mcoord = [];
+      }
+
+      bankData[bank].mcoord.push({
+        name: row.name,
+        type,
+        montant,
+        indice,
+        n_days,
+        daily_p
+      });
     }
 
     return NextResponse.json({

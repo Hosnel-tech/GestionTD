@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -76,6 +77,13 @@ export default function AdminTeachersPage() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importError, setImportError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const primaireFileInputRef = useRef<HTMLInputElement>(null);
+  const supPrimaireFileInputRef = useRef<HTMLInputElement>(null);
+  const dirCensSurvFileInputRef = useRef<HTMLInputElement>(null);
+  const cpSecondaireInputRef = useRef<HTMLInputElement>(null);
+  const membresCoordInputRef = useRef<HTMLInputElement>(null);
+  const [primaireFile, setPrimaireFile] = useState<File | null>(null);
+  const [primaireError, setPrimaireError] = useState<string | null>(null);
 
   // Pour la démo, on suppose que tous les éléments de 'teachers' sont des 'Enseignant'.
   // Pour un vrai usage, il faudrait un champ 'type' dans chaque objet.
@@ -189,7 +197,7 @@ export default function AdminTeachersPage() {
   }
 };
 
-const handleUpload = async (file: File) => {
+/*const handleUpload = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -210,7 +218,45 @@ const handleUpload = async (file: File) => {
   } catch (err: any) {
     setImportError(err.message);
   }
+};*/
+
+const handleSupPrimaireFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target?.result as ArrayBuffer);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    // Combine all rows from all sheets
+    const allRows: any[] = [];
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+      allRows.push(...json);
+    });
+
+    console.log("All combined rows from all sheets:", allRows);
+
+    // Send JSON directly
+    try {
+      const res = await fetch("/api/personnel/sup-cp-primaire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      alert("Importation réussie: " + result.message);
+    } catch (err) {
+      console.error("Erreur réseau:", err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
 };
+
 
 const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0];
@@ -243,6 +289,159 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       alert("Importation réussie: " + result.message);
     } catch (err) {
       console.error("Erreur réseau:", err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+};
+
+const handlePrimaireFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target?.result as ArrayBuffer);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const allRows: any[] = [];
+
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      const rowsWithCentre = json.map((row: any) => ({
+        ...row,
+        CENTRE: sheetName,
+      }));
+
+      allRows.push(...rowsWithCentre);
+    });
+
+    console.log("All combined rows from all sheets (primaire):", allRows);
+
+    try {
+      const res = await fetch("/api/personnel/primaire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      alert("Importation primaire réussie: " + result.message);
+    } catch (err) {
+      console.error("Erreur réseau (primaire):", err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+};
+
+const handleDirCensSurvFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target?.result as ArrayBuffer);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const allRows: any[] = [];
+
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      allRows.push(...json);
+    });
+
+    console.log("All combined rows from all sheets (DIR-CENS-SURV):", allRows);
+
+    try {
+      const res = await fetch("/api/personnel/dir-cens-surv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      alert("Importation Dir, Cens, Surv réussie: " + result.message);
+    } catch (err) {
+      console.error("Erreur réseau (dir-cens-surv):", err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+};
+
+const handleCpSecondaireFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target?.result as ArrayBuffer);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const allRows: any[] = [];
+
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      allRows.push(...json);
+    });
+
+    console.log("All combined rows from all sheets CP Secondaire:", allRows);
+
+    try {
+      const res = await fetch("/api/personnel/cp-secondaire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      alert("Importation cp secondaire réussie: " + result.message);
+    } catch (err) {
+      console.error("Erreur réseau (cp secondaire):", err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+};
+
+const handleMembreCoordFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const data = new Uint8Array(event.target?.result as ArrayBuffer);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const allRows: any[] = [];
+
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      allRows.push(...json);
+    });
+
+    console.log("All combined rows from all sheets Membres Coordination:", allRows);
+
+    try {
+      const res = await fetch("/api/personnel/m-coord", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(allRows),
+      });
+
+      const result = await res.json();
+      alert("Importation Membres Coordination réussie: " + result.message);
+    } catch (err) {
+      console.error("Erreur réseau (membres coord):", err);
     }
   };
 
@@ -297,31 +496,101 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
                   ))}
                 </SelectContent>
               </Select>
-              <input
-                type="file"
-                accept=".csv, .xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-              />
+<Button variant="outline">
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <span>Importer un fichier Excel</span>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+        Profs Secondaire
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => primaireFileInputRef.current?.click()}>
+        Enseignant Primaire
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => supPrimaireFileInputRef.current?.click()}>
+        Sup. & CPs Primaire
+      </DropdownMenuItem >
+      <DropdownMenuItem onClick={() => dirCensSurvFileInputRef.current?.click()}>
+        Dir., Cens., Surv Secondaire
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => cpSecondaireInputRef.current?.click()}>
+        CPs Secondaire
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => membresCoordInputRef.current?.click()}>
+        Membres Coordination
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+</Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Importer CSV/Excel
-              </Button>
-              <input type="file" accept=".xlsx,.xls,.csv" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }}/>
-              {importFile && (
-                <span className="text-xs text-muted-foreground">
-                  Fichier sélectionné : {importFile.name}
-                </span>
-              )}
-              {importError && (
-                <span className="text-xs text-destructive">{importError}</span>
-              )}
-            </div>
+<input
+  type="file"
+  accept=".xlsx,.xls,.csv"
+  ref={fileInputRef}
+  onChange={handleFileChange}
+  style={{ display: "none" }}
+/>
+
+<input
+  type="file"
+  accept=".xlsx,.xls,.csv"
+  ref={primaireFileInputRef}
+  onChange={handlePrimaireFileChange}
+  style={{ display: "none" }}
+/>
+
+<input
+  type="file"
+  accept=".xlsx,.xls,.csv"
+  ref={supPrimaireFileInputRef}
+  onChange={handleSupPrimaireFileChange}
+  style={{ display: "none" }}
+/>
+
+<input
+  type="file"
+  accept=".xlsx,.xls,.csv"
+  ref={dirCensSurvFileInputRef}
+  onChange={handleDirCensSurvFileChange}
+  style={{ display: "none" }}
+/>
+
+<input
+  type="file"
+  accept=".xlsx,.xls,.csv"
+  ref={cpSecondaireInputRef}
+  onChange={handleCpSecondaireFileChange}
+  style={{ display: "none" }}
+/>
+
+<input
+  type="file"
+  accept=".xlsx,.xls,.csv"
+  ref={membresCoordInputRef}
+  onChange={handleMembreCoordFileChange}
+  style={{ display: "none" }}
+/>
+
+{importFile && (
+  <span className="text-xs text-muted-foreground">
+    Fichier sélectionné : {importFile.name}
+  </span>
+)}
+
+{importError && (
+  <span className="text-xs text-destructive">{importError}</span>
+)}
+
+{primaireFile && (
+  <span className="text-xs text-muted-foreground">
+    Fichier sélectionné : {primaireFile.name}
+  </span>
+)}
+{primaireError && (
+  <span className="text-xs text-destructive">{primaireError}</span>
+)}
+          </div>
 
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>

@@ -9,9 +9,10 @@ type TDRow = {
   "Nombre d'heure 3ème"?: string | number;
   "Nombre d'heure Tle"?: string | number;
   "Centre"?: string;
+  "Banques"?: string;
+  "N° de Compte"?: string;
 };
 
-// Subject normalization map (exact matches only, all lowercase)
 const subjectMap: { [key: string]: string } = {
   maths: "Maths",
   math: "Maths",
@@ -35,7 +36,13 @@ function normalizeSubject(raw: string | undefined): string | null {
   const cleaned = raw.trim().toLowerCase();
 
   if (subjectMap[cleaned]) return subjectMap[cleaned];
-
+  if (cleaned.startsWith("co")) return "Com. Écrite";
+  if (cleaned.startsWith("ce")) return "Com. Écrite";
+  if (cleaned.startsWith("le")) return "Lecture";
+  if (cleaned.startsWith("phy")) return "PCT";
+  if (cleaned.startsWith("pc")) return "PCT";
+  if (cleaned.startsWith("sv")) return "SVT";
+  if (cleaned.startsWith("fra")) return "Français";
   if (cleaned.startsWith("espa")) return "Espagnol";
   if (cleaned.startsWith("allem")) return "Allemand";
   if (cleaned.startsWith("math")) return "Maths";
@@ -50,7 +57,6 @@ export async function POST(req: NextRequest) {
     const rows: TDRow[] = await req.json();
     let inserted = 0;
 
-    // Delete existing data
     await pool.query("DELETE FROM tds");
 
     for (const row of rows) {
@@ -59,7 +65,7 @@ export async function POST(req: NextRequest) {
       const rawDate = row["Date séance"];
       let date: Date | null = null;
 
-      // Parse date
+      // Date parsing
       if (Object.prototype.toString.call(rawDate) === "[object Date]") {
         date = rawDate as Date;
       } else if (typeof rawDate === "number") {
@@ -92,7 +98,7 @@ export async function POST(req: NextRequest) {
         duration = hTle;
         tdClass = "Tle";
       } else {
-        console.log("❌ Skipped: no hours provided:", row);
+        console.log("❌ Skipped: no hours:", row);
         continue;
       }
 
@@ -101,14 +107,18 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      const bank = row["Banques"]?.trim() || "";
+      const accountNumber = row["N° de Compte"]?.trim() || "";
+      const school = String(row["Centre"] ?? "").trim();
+
       const id = `td_${uuidv4()}`;
       const createdAt = new Date();
-      const school = String(row["Centre"]);
 
       await pool.query(
-        `INSERT INTO tds (id, teacher, subject, class, duration, date, created_at, school)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, name, subject, tdClass, duration, date, createdAt, school]
+        `INSERT INTO tds (
+          id, teacher, subject, class, duration, date, created_at, school, bank, account_number
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, name, subject, tdClass, duration, date, createdAt, school, bank, accountNumber]
       );
 
       inserted++;
